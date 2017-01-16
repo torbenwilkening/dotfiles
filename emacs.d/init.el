@@ -85,8 +85,7 @@
 
 (when window-system (set-exec-path-from-shell-PATH))
 
-;(setenv "GOPATH" "/Users/torben/Projects/go/greenHyve")
-;(add-to-list 'exec-path "/Users/torben/Projects/go/greenHyve/bin")
+; set gopath somewhere
 (add-hook 'before-save-hook 'gofmt-before-save)
 
 ;Call Gofmt before saving
