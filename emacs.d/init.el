@@ -35,7 +35,7 @@
 
 ;; check if packages are installed and if not install
 (defvar own-packages
-  '(go-mode go-autocomplete android-mode flycheck js2-mode json-mode web-mode auto-complete tern-auto-complete))
+  '(go-mode go-autocomplete android-mode flycheck js2-mode json-mode web-mode auto-complete tern-auto-complete jedi-core jedi))
 
 (defun own-packages-installed-p ()
   (loop for p in own-packages
@@ -74,6 +74,8 @@
 
 
 ;;go stuff
+;; install go-code before
+;; go install https://github.com/nsf/gocode
 (defun set-exec-path-from-shell-PATH ()
   (let ((path-from-shell (replace-regexp-in-string
                           "[ \t\n]*$"
@@ -169,3 +171,10 @@
 
 ;; install following emacs packages:
 ;; flycheck, js2-mode, json-mode, web-mode, (osx -> exec-path-from-shell)
+
+;; python development make sure virtual-env is install and
+;; run jedi:install-server
+(autoload 'jedi:setup "jedi" nil t)
+(add-hook 'python-mode-hook 'jedi:setup)
+(setq jedi:complete-on-dot t)
+
