@@ -35,7 +35,7 @@
 
 ;; check if packages are installed and if not install
 (defvar own-packages
-  '(go-mode go-autocomplete android-mode flycheck js2-mode json-mode web-mode auto-complete tern-auto-complete jedi-core jedi))
+  '(go-mode go-autocomplete android-mode flycheck js2-mode json-mode web-mode auto-complete tern-auto-complete jedi-core jedi typescript-mode tss))
 
 (defun own-packages-installed-p ()
   (loop for p in own-packages
@@ -116,6 +116,29 @@
 (add-hook 'go-mode-hook 'my-go-mode-hook)
 
 
+
+;;;;;;;;;;; Typescript stuff
+;; npm install -g typescript typescript-tools
+;; If use bundled typescript.el,
+(require 'typescript)
+(add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
+
+(require 'tss)
+
+;; Key binding
+(setq tss-popup-help-key "C-:")
+(setq tss-jump-to-definition-key "C->")
+(setq tss-implement-definition-key "C-c i")
+
+;; Make config suit for you. About the config item, eval the following sexp.
+;; (customize-group "tss")
+
+;; Do setting recommemded configuration
+(tss-config-default)
+
+
+
+
 ;;;;;;;;;;; ES6 stuff
 ; npm install -g eslint babel-eslint eslint-plugin-react tern
 ; use web-mode for .jsx files
@@ -177,4 +200,34 @@
 (autoload 'jedi:setup "jedi" nil t)
 (add-hook 'python-mode-hook 'jedi:setup)
 (setq jedi:complete-on-dot t)
+
+;;;;;;;;;;; Typescript stuff
+;; npm install -g typescript typescript-tools
+;; If use bundled typescript.el,
+(require 'typescript)
+(add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
+
+(require 'tss)
+
+;; Key binding
+(setq tss-popup-help-key "C-:")
+(setq tss-jump-to-definition-key "C->")
+(setq tss-implement-definition-key "C-c i")
+
+;; Make config suit for you. About the config item, eval the following sexp.
+;; (customize-group "tss")
+
+;; Do setting recommemded configuration
+(tss-config-default)
+
+(global-set-key (kbd "C-o") 'other-window)
+(global-set-key (kbd "C-p") 'prev-window)
+
+(defun prev-window ()
+  (interactive)
+  (other-window -1))
+
+
+
+
 
