@@ -10,5 +10,5 @@
 `go install github.com/nsf/gocode`
 ### For Python Development ###
 * Make sure that virtualenv is installed, if not :
-  ** install it with easy_install : `easy_install virtualenv`
-  ** install it with pip : `pip install virtualenv`
+  * install it with easy_install : `easy_install virtualenv`
+  * install it with pip : `pip install virtualenv`
