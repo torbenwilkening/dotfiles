@@ -9,7 +9,6 @@
 * Make sure that your $GOPATH is set and install go code (https://github.com/nsf/gocode) for auto completion
 `go install github.com/nsf/gocode`
 ### For Python Development ###
-* Make sure that virtualenv is installed, if not :
-  * install it with easy_install : `easy_install virtualenv`
-  or
-  * install it with pip : `pip install virtualenv`
+* Make sure that virtualenv is installed, if not use easy_install or pip to install it :
+  * easy_install : `easy_install virtualenv`
+  * pip : `pip install virtualenv`
