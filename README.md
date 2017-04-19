@@ -11,4 +11,5 @@
 ### For Python Development ###
 * Make sure that virtualenv is installed, if not :
   * install it with easy_install : `easy_install virtualenv`
+  or
   * install it with pip : `pip install virtualenv`
