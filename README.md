@@ -5,7 +5,9 @@ This is a simple emacs configuration with emacs prelude and some packages for va
 ### First Steps ###
 * Install Emacs Prelude (https://github.com/bbatsov/prelude)
 * Append init.el :
+
 `curl -XGET https://raw.githubusercontent.com/torbenwilkening/dotfiles/master/emacs.d/init.el >> ~/.emacs.d/init.el`
+* Start Emacs and it will install the neccessary packages from MELPA
 ### For Javascript Development ###
 * Install neccessary packages via npm for ES6 and TypeScript development :
 `npm install -g eslint babel-eslint eslint-plugin-react tern typescript typescript-tools`
