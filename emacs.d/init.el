@@ -177,7 +177,7 @@ by Prelude.")
 
 ;; check if packages are installed and if not install
 (defvar own-packages
-  '(go-mode go-autocomplete android-mode flycheck js2-mode json-mode web-mode auto-complete tern-auto-complete jedi-core jedi typescript-mode tss rjsx-mode))
+  '(go-mode go-autocomplete android-mode flycheck js2-mode json-mode web-mode auto-complete tern-auto-complete jedi-core jedi typescript-mode tss rjsx-mode websocket jss))
 
 (defun own-packages-installed-p ()
   (loop for p in own-packages
@@ -405,7 +405,10 @@ by Prelude.")
 ;; install following emacs packages:
 ;; flycheck, js2-mode, json-mode, web-mode, (osx -> exec-path-from-shell)
 
-
+;; for chrome debugging with jss :
+;; linux: chromium --remote-debugging-port=9222
+;; osx: /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222
+;; jss-connect -> webkit _-> insert host
 
 
 ;; python development make sure virtual-env is install and
