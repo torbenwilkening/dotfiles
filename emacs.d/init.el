@@ -1,5 +1,4 @@
 
-;;; CUSTOM INIT
 
 ;; melpa stuff
 (require 'package)
@@ -8,284 +7,102 @@
 
 
 ;;; Uncomment the modules you'd like to use and restart Prelude afterwards
-;(require 'prelude-c)
-;(require 'prelude-clojure)
-;; (require 'prelude-coffee)
-;; (require 'prelude-common-lisp)
-;; (require 'prelude-css)
-;(require 'prelude-emacs-lisp)
-;(require 'prelude-erc)
-;; (require 'prelude-erlang)
-;; (require 'prelude-elixir)
-;; (require 'prelude-haskell)
-;; (require 'prelude-js)
-;; (require 'prelude-latex)
-;(require 'prelude-lisp)
-;; (require 'prelude-mediawiki)
-;(require 'prelude-org)
-;(require 'prelude-perl)
-;(require 'prelude-python)
-;(require 'prelude-ruby)
-;(require 'prelude-scala)
-;(require 'prelude-scheme)
-;; (require 'prelude-scss)
-;; (require 'prelude-web)
-;(require 'prelude-xml)
+(require 'prelude-c)
+(require 'prelude-clojure)
+(require 'prelude-coffee)
+(require 'prelude-common-lisp)
+;(require 'prelude-css)
+(require 'prelude-emacs-lisp)
+(require 'prelude-erc)
+(require 'prelude-erlang)
+(require 'prelude-elixir)
+(require 'prelude-haskell)
+;(require 'prelude-js)
+(require 'prelude-latex)
+(require 'prelude-lisp)
+(require 'prelude-mediawiki)
+(require 'prelude-org)
+(require 'prelude-perl)
+(require 'prelude-python)
+(require 'prelude-ruby)
+(require 'prelude-scala)
+(require 'prelude-scheme)
+;(require 'prelude-scss)
+;(require 'prelude-web)
+(require 'prelude-xml)
 
 
 ;; check if packages are installed and if not install
-(defvar own-packages
-  '(go-mode go-autocomplete android-mode flycheck js2-mode json-mode web-mode auto-complete tern-auto-complete jedi-core jedi typescript-mode tss rjsx-mode websocket jss))
+;;  company-web-html typescript-mode
+;;(defvar own-packages
+;;  '(company company-tern go-company go-mode jedi-core jedi company-jedi android-mode flycheck js2-mode json-mode web-mode websocket jss ))
 
-(defun own-packages-installed-p ()
-  (loop for p in own-packages
-        when (not (packages-installed-p p)) do (return nil)
-        finally (return t)))
+;;(defun own-packages-installed-p ()
+;;  (loop for p in own-packages
+;;        when (not (packages-installed-p p)) do (return nil)
+;;        finally (return t)))
 
 ;; install if not installed
-(dolist (p own-packages)
-  (when (not (package-installed-p p))
-    (package-install p)))
-
-;; dirty fix for having AC everywhere
-;(define-globalized-minor-mode real-global-auto-complete-mode
-;  auto-complete-mode (lambda ()
-;                       (if (not (minibufferp (current-buffer)))
-;                           (auto-complete-mode 1))
-;                       ))
-;(real-global-auto-complete-mode t)
-
-
-;set default modifier keys
-(setq mac-option-modifier nil
-      mac-command-modifier 'meta
-      x-select-enable-clipboard t)
-
-;; disable whitespace mode
-(setq prelude-whitespace nil)
-
-;; enable ac by default
-(global-auto-complete-mode t)
-;; add modes to auto-complete
-;; dirty fix for having AC everywhere
-(define-globalized-minor-mode real-global-auto-complete-mode
-  auto-complete-mode (lambda ()
-                       (if (not (minibufferp (current-buffer)))
-                           (auto-complete-mode 1))
-                       ))
-(real-global-auto-complete-mode t)
-
-;; https://github.com/purcell/exec-path-from-shell
-;; only need exec-path-from-shell on OSX
-;; this hopefully sets up path and other vars better
-(when (memq window-system '(mac ns))
-  (exec-path-from-shell-initialize))
-
-;;android MODE
-;; Omit the next line if installed through ELPA
-(require 'android-mode)
-(custom-set-variables '(android-mode-sdk-dir "/usr/local/opt/android"))
-
-
-;;go stuff
-;; install go-code before
-;; go install https://github.com/nsf/gocode
-(defun set-exec-path-from-shell-PATH ()
-  (let ((path-from-shell (replace-regexp-in-string
-                          "[ \t\n]*$"
-                          ""
-                          (shell-command-to-string "$SHELL --login -i -c 'echo $PATH'"))))
-    (setenv "PATH" path-from-shell)
-    (setq eshell-path-env path-from-shell) ; for eshell users
-    (setq exec-path (split-string path-from-shell path-separator))))
-
-(when window-system (set-exec-path-from-shell-PATH))
-
-; set gopath somewhere
-(add-hook 'before-save-hook 'gofmt-before-save)
-
-;Call Gofmt before saving
-(defun my-go-mode-hook ()
-  (add-hook 'before-save-hook 'gofmt-before-save)
-;Godef jump key binding
-  (local-set-key (kbd "M-.") 'godef-jump))
-(add-hook 'go-mode-hook 'my-go-mode-hook)
-
-(defun auto-complete-for-go ()
-  (auto-complete-mode 1))
-(add-hook 'go-mode-hook 'auto-complete-for-go)
-
-(with-eval-after-load 'go-mode
-  (require 'go-autocomplete))
-
-(defun my-go-mode-hook ()
-; Call Gofmt before saving
-  (add-hook 'before-save-hook 'gofmt-before-save)
-; Customize compile command to run go build
-  (if (not (string-match "go" compile-command))
-      (set (make-local-variable 'compile-command)
-           "go build -v && go test -v && go vet"))
-; Godef jump key binding
-  (local-set-key (kbd "M-.") 'godef-jump))
-(add-hook 'go-mode-hook 'my-go-mode-hook)
-
-;; PHP stuff
-(autoload 'php-mode "php-mode" "Major mode for editing PHP code." t)
-(add-to-list 'auto-mode-alist '("\\.php$" . php-mode))
-(add-to-list 'auto-mode-alist '("\\.inc$" . php-mode))
-
-
-(add-hook 'php-mode-hook
-          '(lambda ()
-             (auto-complete-mode t)
-             (require 'ac-php)
-             (setq ac-sources  '(ac-source-php ) )
-             (yas-global-mode 1)
-
-             (ac-php-core-eldoc-setup ) ;; enable eldoc
-             (define-key php-mode-map  (kbd "C-]") 'ac-php-find-symbol-at-point)   ;goto define
-             (define-key php-mode-map  (kbd "C-t") 'ac-php-location-stack-back   ) ;go back
-             ))
-
-;;;;;;;;;;; Typescript stuff
-;; npm install -g typescript typescript-tools
-;; If use bundled typescript.el,
-(require 'typescript)
-(add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
-
-(require 'tss)
-
-;; Key binding
-(setq tss-popup-help-key "C-:")
-(setq tss-jump-to-definition-key "C->")
-(setq tss-implement-definition-key "C-c i")
-
-;; Make config suit for you. About the config item, eval the following sexp.
-;; (customize-group "tss")
-
-;; Do setting recommemded configuration
-(tss-config-default)
-
-
-;;;;;;;;;;; ES6 stuff
-; npm install -g eslint babel-eslint eslint-plugin-react tern
-; use web-mode for .jsx files
-
-
-(require 'web-mode)
-;(add-to-list 'auto-mode-alist '("\\.js?\\'" . web-mode))
-;(setq web-mode-content-types-alist
-;      '(("jsx"  . "\\.js?\\'")))
-
-(require 'rjsx-mode)
-(add-to-list 'auto-mode-alist '("\\.js?\\'" . rjsx-mode))
-(setq rjsx-mode-content-types-alist
-      '(("jsx"  . "\\.js?\\'")))
-
-;;http://www.flycheck.org/manual/latest/index.html
-(require 'flycheck)
-;; turn on flychecking globally
-(add-hook 'after-init-hook #'global-flycheck-mode)
-;; disable jshint since we prefer eslint checking
-(setq-default flycheck-disabled-checkers
-              (append flycheck-disabled-checkers
-                      '(javascript-jshint)))
-;; use eslint with web-mode for jsx files
-(flycheck-add-mode 'javascript-eslint 'web-mode)
-(flycheck-add-mode 'javascript-eslint 'js2-mode)
-(flycheck-add-mode 'javascript-eslint 'rjsx-mode)
-;; customize flycheck temp file prefix
-(setq-default flycheck-temp-prefix ".flycheck")
-;; disable json-jsonlist checking for json files
-(setq-default flycheck-disabled-checkers
-              (append flycheck-disabled-checkers
-                      '(json-jsonlist)))
-
-;; js indent and stuff
-;; for better jsx syntax-highlighting in web-mode
-;; - courtesy of Patrick @halbtuerke
-(defadvice web-mode-highlight-part (around tweak-jsx activate)
-  (if (equal web-mode-content-type "jsx")
-      (let ((web-mode-enable-part-face nil))
-        ad-do-it)
-    ad-do-it))
-
-
-
-(setq web-mode-enable-current-element-highlight t)
-(setq web-mode-enable-current-column-highlight t)
-;; adjust indents for web-mode to 2 spaces
-;(defun my-web-mode-hook ()
-;  "Hooks for Web mode. Adjust indents"
-  ;;; http://web-mode.org/
-;  (setq web-mode-markup-indent-offset 2)
-;  (setq web-mode-css-indent-offset 2)
-;  (setq web-mode-code-indent-offset 2))
-;(add-hook 'web-mode-hook  'my-web-mode-hook)
-
-;(add-to-list 'load-path "~.emacs.d/tern/")
-
-;(require 'auto-complete)
-
-
-;(require 'tern-auto-complete)
-
-(autoload 'tern-mode "tern.el" nil t)
-(add-hook 'web-mode-hook (lambda () (tern-mode t)))
-
-(add-hook 'js-mode-hook (lambda () (tern-mode t)))
-(eval-after-load 'tern
-  '(progn
-     (require 'tern-auto-complete)
-     (tern-ac-setup)))
-
-
-
-(add-hook 'rjsx-mode-hook (lambda () (tern-mode t)))
-(eval-after-load 'tern
-  '(progn
-     (require 'tern-auto-complete)
-     (tern-ac-setup)))
-
-
-(add-hook 'web-mode-hook (lambda () (tern-mode t)))
-(eval-after-load 'tern
-  '(progn
-     (require 'tern-auto-complete)
-     (tern-ac-setup)))
+;;(dolist (p own-packages)
+;;  (when (not (package-installed-p p))
+;;    (package-install p)))
 
 
 
 
-; add .tern-project :
-;{ "plugins": {"node": {}}}
+;; python stuff
+(require 'company-jedi)
+(defun my/python-mode-hook ()
+  (add-to-list 'company-backends 'company-jedi))
+(add-hook 'python-mode-hook 'my/python-mode-hook)
 
-;; install following emacs packages:
-;; flycheck, js2-mode, json-mode, web-mode, (osx -> exec-path-from-shell)
+;; nodejs stuff
+;; for debugging check https://indium.readthedocs.io/en/latest/setup.html
+(require 'company)
+(require 'company-web-html)
+(require 'company-tern)
+(require 'company-go)
 
-;; for chrome debugging with jss :
-;; linux: chromium --remote-debugging-port=9222
-;; osx: /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222
-;; jss-connect -> webkit _-> insert host
+;; jsmode stuff
+(require 'js2-mode)
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 
-
-;; python development make sure virtual-env is install and
-;; run jedi:install-server
-(autoload 'jedi:setup "jedi" nil t)
-(add-hook 'python-mode-hook 'jedi:setup)
-(setq jedi:complete-on-dot t)
-
-
-(global-set-key (kbd "C-o") 'other-window)
-(global-set-key (kbd "C-p") 'prev-window)
-
-(defun prev-window ()
-  (interactive)
-  (other-window -1))
+(add-to-list 'company-backends 'company-tern)
+(add-hook 'js2-mode-hook (lambda ()
+                           (tern-mode)
+                           (company-mode)))
 
 
+;; webmode stuff
+(defun my-web-mode-hook ()
+  "Hook for `web-mode'."
+  (set (make-local-variable 'company-backends)
+       '(company-tern company-web-html company-yasnippet company-files)))
+(add-hook 'web-mode-hook 'my-web-mode-hook)
+
+(add-hook 'web-mode-hook (lambda ()
+                          (set (make-local-variable 'company-backends) '(company-web-html))
+                          (company-mode t)))
 
 
+;; Enable JavaScript completion between <script>...</script> etc.
+(advice-add 'company-tern :before
+            #'(lambda (&rest _)
+                (if (equal major-mode 'web-mode)
+                    (let ((web-mode-cur-language
+                           (web-mode-language-at-pos)))
+                      (if (or (string= web-mode-cur-language "javascript")
+                              (string= web-mode-cur-language "jsx"))
+                          (unless tern-mode (tern-mode))
+                        (if tern-mode (tern-mode -1)))))))
 
 
-
+;; go stuff
+(add-hook 'go-mode-hook (lambda ()
+                          (set (make-local-variable 'company-backends) '(company-go))
+                          (company-mode)))
+;; some go company tweaks
+(setq company-tooltip-limit 20)                      ; bigger popup window
+(setq company-idle-delay .3)                         ; decrease delay before autocompletion popup shows
+(setq company-echo-delay 0)                          ; remove annoying blinking
+(setq company-begin-commands '(self-insert-command)) ; start autocompletion only after typing
