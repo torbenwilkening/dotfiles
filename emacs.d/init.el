@@ -35,7 +35,7 @@
 ;; check if packages are installed and if not install
 ;;  company-web-html typescript-mode
 ;;(defvar own-packages
-;;  '(company company-tern go-company go-mode jedi-core jedi company-jedi android-mode flycheck js2-mode json-mode web-mode websocket jss ))
+;;  '(company company-tern go-company go-mode tide jedi-core jedi company-jedi android-mode flycheck js2-mode json-mode web-mode websocket jss ))
 
 ;;(defun own-packages-installed-p ()
 ;;  (loop for p in own-packages
@@ -48,7 +48,8 @@
 ;;    (package-install p)))
 
 
-
+;; grails stuff
+(require 'grails)
 
 ;; python stuff
 (require 'company-jedi)
@@ -107,8 +108,6 @@
 (setq company-echo-delay 0)                          ; remove annoying blinking
 (setq company-begin-commands '(self-insert-command)) ; start autocompletion only after typing
 
-
-
 ;; company mode autocompletion on first character
 (setq company-minimum-prefix-length 1)
 ;; disable only lowercase in company autocompletion
@@ -138,7 +137,7 @@
 (add-hook 'typescript-mode-hook #'setup-tide-mode)
 
 (require 'web-mode)
-(add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
+;(add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
 (add-hook 'web-mode-hook
           (lambda ()
             (when (string-equal "ts" (file-name-extension buffer-file-name))
@@ -159,3 +158,50 @@
 ;; try this for react:
 (add-to-list 'magic-mode-alist
              '("\\(import.*from \'react\';\\|\/\/ @flow\nimport.*from \'react\';\\)" . rjsx-mode))
+
+;; indium js development
+;; https://indium.readthedocs.io/en/latest/installation.html
+(unless (package-installed-p 'indium)
+  (package-install 'indium))
+;; and setup your project : https://indium.readthedocs.io/en/latest/setup.html
+(require 'indium)
+(add-hook 'js2-mode-hook #'indium-interaction-mode)
+; some .tern-project file example for ~/.tern-project
+;{
+;; "libs": [
+;;          "browser",
+;;          "jquery",
+;;          "react",
+;;          "chai",
+;;          "ecma5",
+;;          "ecma6"
+;;          ],
+;; "defs": [
+;;          "browser",
+;;          "ecma5",
+;;          "ecma6"
+;;          ],
+;; "plugins": {
+;; "doc_comment": {
+;; },
+;; "angular": {
+;; },
+;; "node": {
+;; },
+;; "commonjs": {
+;; },
+;; "complete_strings": {
+;; },
+;; "es_modules": {
+;; },
+;; "modules": {
+;; },
+;; "node_resolve": {
+;; },
+;; "requirejs": {
+;; },
+;; "webpack": {
+;; }
+;; },
+;; "ecmaVersion": 6
+;; }
