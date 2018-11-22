@@ -1,9 +1,10 @@
-
-
+;;; CUSTOM INIT
 ;; melpa stuff
 (require 'package)
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.milkbox.net/packages/") t)
+
+(scroll-bar-mode -1)
 
 
 ;;; Uncomment the modules you'd like to use and restart Prelude afterwards
@@ -56,7 +57,7 @@
 (defun my/python-mode-hook ()
   (add-to-list 'company-backends 'company-jedi))
 (add-hook 'python-mode-hook 'my/python-mode-hook)
-
+(setq jedi:complete-on-dot t)
 ;; nodejs stuff
 ;; for debugging check https://indium.readthedocs.io/en/latest/setup.html
 (require 'company)
@@ -167,7 +168,7 @@
 (require 'indium)
 (add-hook 'js2-mode-hook #'indium-interaction-mode)
 ; some .tern-project file example for ~/.tern-project
-;{
+                                        ;{
 ;; "libs": [
 ;;          "browser",
 ;;          "jquery",
@@ -205,3 +206,16 @@
 ;; },
 ;; "ecmaVersion": 6
 ;; }
+
+
+
+
+(global-set-key (kbd "C-o") 'other-window)
+(global-set-key (kbd "C-p") 'prev-window)
+
+(defun prev-window ()
+  (interactive)
+  (other-window -1))
+
+;; disable whitespace mode
+(setq prelude-whitespace nil)
