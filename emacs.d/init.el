@@ -24,7 +24,7 @@
 (require 'prelude-perl)
 ;(require 'prelude-python)
 (require 'prelude-ruby)
-(require 'prelude-scala)
+;(require 'prelude-scala)
 (require 'prelude-scheme)
 ;(require 'prelude-scss)
 ;(require 'prelude-web)
@@ -47,7 +47,8 @@
 (require 'company-jedi)
 (require 'indium)
 (require 'rjsx-mode)
-
+(require 'ensime)
+(require 'scala-mode)
 
 (defun my-python-mode-hook ()
   (add-to-list 'company-backends 'company-jedi)
@@ -56,7 +57,14 @@
 
 
 ;; scala stuff
-(add-to-list 'auto-mode-alist '("\\.scala\\'" . prelude-scala))
+(add-to-list 'auto-mode-alist '("\\.scala\\'" . scala-mode))
+;;(defun my-scala-mode-hook ()
+;;  (ensime))
+;;(add-hook 'scala-mode-hook 'my-scala-mode-hook)
+
+;; put this to ~/.sbt/1.0/plugins.sbt
+;;addSbtPlugin("org.ensime" % "sbt-ensime" % "2.5.1")
+;;ensimeIgnoreScalaMismatch in ThisBuild := true
 
 
 ;; js2-mode stuff (node)
