@@ -1,10 +1,8 @@
-;;; CUSTOM INIT
+
 ;; melpa stuff
 (require 'package)
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.milkbox.net/packages/") t)
-
-(scroll-bar-mode -1)
 
 
 ;;; Uncomment the modules you'd like to use and restart Prelude afterwards
@@ -24,7 +22,7 @@
 (require 'prelude-mediawiki)
 (require 'prelude-org)
 (require 'prelude-perl)
-(require 'prelude-python)
+;(require 'prelude-python)
 (require 'prelude-ruby)
 (require 'prelude-scala)
 (require 'prelude-scheme)
@@ -33,46 +31,54 @@
 (require 'prelude-xml)
 
 
-;; check if packages are installed and if not install
-;;  company-web-html typescript-mode
-;;(defvar own-packages
-;;  '(company company-tern go-company go-mode tide jedi-core jedi company-jedi android-mode flycheck js2-mode json-mode web-mode websocket jss ))
+;; install packages if not exists:
 
-;;(defun own-packages-installed-p ()
-;;  (loop for p in own-packages
-;;        when (not (packages-installed-p p)) do (return nil)
-;;        finally (return t)))
-
-;; install if not installed
-;;(dolist (p own-packages)
-;;  (when (not (package-installed-p p))
-;;    (package-install p)))
-
-
-;; grails stuff
-(require 'grails)
+;;(unless (package-installed-p 'indium)
+;;  (package-install 'indium))
 
 ;; python stuff
-(require 'company-jedi)
-(defun my/python-mode-hook ()
-  (add-to-list 'company-backends 'company-jedi))
-(add-hook 'python-mode-hook 'my/python-mode-hook)
-(setq jedi:complete-on-dot t)
-;; nodejs stuff
-;; for debugging check https://indium.readthedocs.io/en/latest/setup.html
 (require 'company)
 (require 'company-web-html)
 (require 'company-tern)
 (require 'company-go)
-
-;; jsmode stuff
 (require 'js2-mode)
-(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+(require 'web-mode)
+(require 'grails)
+(require 'company-jedi)
+(require 'indium)
 
+
+(defun my-python-mode-hook ()
+  (add-to-list 'company-backends 'company-jedi)
+  development)
+(add-hook 'python-mode-hook 'my-python-mode-hook)
+
+
+;; scala stuff
+(add-to-list 'auto-mode-alist '("\\.scala\\'" . prelude-scala))
+
+
+;; js2-mode stuff (node)
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 (add-to-list 'company-backends 'company-tern)
 (add-hook 'js2-mode-hook (lambda ()
                            (tern-mode)
                            (company-mode)))
+
+
+;; js2-jsx-mode stuff (react)
+(add-to-list 'magic-mode-alist
+             '("\\(import.*from \'react\';\\|\/\/ @flow\nimport.*from \'react\';\\)" . js2-jsx-mode))
+(flycheck-add-mode 'javascript-eslint 'js2-mode)
+(add-hook 'js2-jsx-mode-hook (lambda ()
+                           (tern-mode)
+                           (company-mode)
+                           (rjsx-minor-mode)))
+(flycheck-add-mode 'javascript-eslint 'js2-jsx-mode)
+
+;; indium js debugger
+;; and setup your project : https://indium.readthedocs.io/en/latest/setup.html
+(add-hook 'js2-mode-hook #'indium-interaction-mode)
 
 
 ;; webmode stuff
@@ -81,11 +87,9 @@
   (set (make-local-variable 'company-backends)
        '(company-tern company-web-html company-yasnippet company-files)))
 (add-hook 'web-mode-hook 'my-web-mode-hook)
-
 (add-hook 'web-mode-hook (lambda ()
                           (set (make-local-variable 'company-backends) '(company-web-html))
                           (company-mode t)))
-
 
 ;; Enable JavaScript completion between <script>...</script> etc.
 (advice-add 'company-tern :before
@@ -99,22 +103,15 @@
                         (if tern-mode (tern-mode -1)))))))
 
 
+
+
+
 ;; go stuff
 (add-hook 'go-mode-hook (lambda ()
                           (set (make-local-variable 'company-backends) '(company-go))
                           (company-mode)))
-;; some go company tweaks
-(setq company-tooltip-limit 20)                      ; bigger popup window
-(setq company-idle-delay .3)                         ; decrease delay before autocompletion popup shows
-(setq company-echo-delay 0)                          ; remove annoying blinking
-(setq company-begin-commands '(self-insert-command)) ; start autocompletion only after typing
 
-;; company mode autocompletion on first character
-(setq company-minimum-prefix-length 1)
-;; disable only lowercase in company autocompletion
-(setq company-dabbrev-downcase nil)
-;; default font size
-(set-face-attribute 'default nil :height 100)
+
 
 
 ;; typescript stuff
@@ -136,9 +133,6 @@
 ;; formats the buffer before saving
 (add-hook 'before-save-hook 'tide-format-before-save)
 (add-hook 'typescript-mode-hook #'setup-tide-mode)
-
-(require 'web-mode)
-;(add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
 (add-hook 'web-mode-hook
           (lambda ()
             (when (string-equal "ts" (file-name-extension buffer-file-name))
@@ -149,26 +143,14 @@
 ;; M-: key for GoToDefinition
 ;; M-; key for GoBack
 ;; M-- key for FindUsages
-
 (add-hook 'tide-mode-hook
           (lambda () (local-set-key (kbd "M-m") 'tide-references)))
 
 
 
 
-;; try this for react:
-(add-to-list 'magic-mode-alist
-             '("\\(import.*from \'react\';\\|\/\/ @flow\nimport.*from \'react\';\\)" . rjsx-mode))
-
-;; indium js development
-;; https://indium.readthedocs.io/en/latest/installation.html
-(unless (package-installed-p 'indium)
-  (package-install 'indium))
-;; and setup your project : https://indium.readthedocs.io/en/latest/setup.html
-(require 'indium)
-(add-hook 'js2-mode-hook #'indium-interaction-mode)
 ; some .tern-project file example for ~/.tern-project
-                                        ;{
+;{
 ;; "libs": [
 ;;          "browser",
 ;;          "jquery",
@@ -207,19 +189,25 @@
 ;; "ecmaVersion": 6
 ;; }
 
-;; to enable proper eslint in jsx: npm install -g eslint-plugin-react
-;; with a .eslintrc in projects root
-;;"extends": [
-;;    "eslint:recommended",
-;;    "plugin:react/recommended"
-;;]
 
+;; default emacs tweaks
+(scroll-bar-mode -1)
+
+;; some company tweaks
+(setq company-tooltip-limit 20)                      ; bigger popup window
+(setq company-idle-delay .3)                         ; decrease delay before autocompletion popup shows
+(setq company-echo-delay 0)                          ; remove annoying blinking
+(setq company-begin-commands '(self-insert-command)) ; start autocompletion only after typing
+;; company mode autocompletion on first character
+(setq company-minimum-prefix-length 1)
+;; disable only lowercase in company autocompletion
+(setq company-dabbrev-downcase nil)
+
+;; shortcuts
+(set-face-attribute 'default nil :height 100)
 (global-set-key (kbd "C-o") 'other-window)
 (global-set-key (kbd "C-p") 'prev-window)
 
 (defun prev-window ()
   (interactive)
   (other-window -1))
-
-;; disable whitespace mode
-(setq prelude-whitespace nil)
