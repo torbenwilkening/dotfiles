@@ -46,6 +46,7 @@
 (require 'grails)
 (require 'company-jedi)
 (require 'indium)
+(require 'rjsx-mode)
 
 
 (defun my-python-mode-hook ()
