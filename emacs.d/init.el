@@ -207,8 +207,12 @@
 ;; "ecmaVersion": 6
 ;; }
 
-
-
+;; to enable proper eslint in jsx: npm install -g eslint-plugin-react
+;; with a .eslintrc in projects root
+;;"extends": [
+;;    "eslint:recommended",
+;;    "plugin:react/recommended"
+;;]
 
 (global-set-key (kbd "C-o") 'other-window)
 (global-set-key (kbd "C-p") 'prev-window)
