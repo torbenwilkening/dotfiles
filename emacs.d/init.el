@@ -1,4 +1,5 @@
 
+
 ;; melpa stuff
 (require 'package)
 (add-to-list 'package-archives
@@ -24,7 +25,7 @@
 (require 'prelude-perl)
 ;(require 'prelude-python)
 (require 'prelude-ruby)
-;(require 'prelude-scala)
+(require 'prelude-scala)
 (require 'prelude-scheme)
 ;(require 'prelude-scss)
 ;(require 'prelude-web)
@@ -50,6 +51,14 @@
 (require 'ensime)
 (require 'scala-mode)
 
+
+
+
+;; scala stuff
+
+
+
+;; python stuff
 (defun my-python-mode-hook ()
   (add-to-list 'company-backends 'company-jedi)
   development)
@@ -158,7 +167,7 @@
 
 
 
-; some .tern-project file example for ~/.tern-project
+; some .tern-project file example for ~/.tern-project
 ;{
 ;; "libs": [
 ;;          "browser",
@@ -214,9 +223,20 @@
 
 ;; shortcuts
 (set-face-attribute 'default nil :height 100)
-(global-set-key (kbd "C-o") 'other-window)
-(global-set-key (kbd "C-p") 'prev-window)
+;(setq global-map (make-keymap))
 
-(defun prev-window ()
-  (interactive)
-  (other-window -1))
+;;(define-key (current-global-map) (kbd "C-o") 'other-window)
+;;(define-key (current-global-map) [remap kill-line] 'my-homemade-kill-line)
+;;(global-set-key (kbd "C-o") 'other-window)
+;;(global-set-key (kbd "C-p") 'prev-window)
+;;(defun prev-window ()
+;;  (interactive)
+;;  (other-window -1))
+
+;; path variable
+(add-to-list 'exec-path "/usr/local/bin")
+
+;; some sql mode fixes
+(add-hook 'sql-interactive-mode-hook
+          (lambda ()
+            (toggle-truncate-lines t)))
