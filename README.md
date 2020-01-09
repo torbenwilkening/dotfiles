@@ -2,10 +2,8 @@
 
 ## Emacs ##
 This is a simple emacs configuration with emacs prelude and some packages for various programming languages. Some keybindings are changed :
+---
 
-`C-o` : switch to other window
-
-`C-p` : switch to previous window
 
 Follow the steps to get started
 ### First Steps ###
