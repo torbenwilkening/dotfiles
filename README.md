@@ -1,8 +1,8 @@
 
 
 ## Emacs ##
-This is a simple emacs configuration with emacs prelude and some packages for various programming languages. Some keybindings are changed :
----
+
+
 
 
 Follow the steps to get started
