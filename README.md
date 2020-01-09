@@ -24,3 +24,9 @@ Follow the steps to get started
 * Make sure that virtualenv is installed, if not use easy_install or pip to install it :
   * easy_install : `easy_install virtualenv`
   * pip : `pip install virtualenv`
+
+
+### For Ruby Development ###
+
+* make sure you have these gems installed:
+`pry pry-doc method_source seeing_is_believing rubocop `
