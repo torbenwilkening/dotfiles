@@ -298,16 +298,5 @@
 ;; "ecmaVersion": 6
 ;; }
 
-;; sumcumo specific
-
-(exec-path-from-shell-copy-env "ERGO_DATABASE_HOST")
-(exec-path-from-shell-copy-env "ERGO_DATABASE_USER")
-(exec-path-from-shell-copy-env "ERGO_DATABASE_PASSWORD")
-
-(exec-path-from-shell-copy-env "MYSQL_HOST")
-(exec-path-from-shell-copy-env "MYSQL_USER")
-(exec-path-from-shell-copy-env "MYSQL_PASSWORD")
-
-(exec-path-from-shell-copy-env "SILENCE_SCIP_DEPRECATIONS")
 
 
