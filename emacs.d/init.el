@@ -1,5 +1,4 @@
 
-
 ;;package loading and repos
 (require 'package)
 (setq load-prefer-newer t
@@ -18,11 +17,11 @@
 ;; default stuff
 
 (use-package company :ensure t)
-(use-package company-quickhelp :ensure t)
-(company-quickhelp-mode)
-;;(use-package company-box
-;;  :init (setq company-box-enable-icon (display-graphic-p))
-;;  :hook (company-mode . company-box-mode))
+;;(use-package company-quickhelp :ensure t)
+;;(company-quickhelp-mode)
+(use-package company-box
+  :init (setq company-box-enable-icon (display-graphic-p))
+  :hook (company-mode . company-box-mode))
 ;; go to ~/.emacs.d/elpa/26.1/develop/company-box-xxx/images
 ;; and run mogrify -resize 50% *.png if images are too big
 
@@ -35,10 +34,17 @@
 (setq company-echo-delay 0)                          ; remove annoying blinking
 (setq company-begin-commands '(self-insert-command)) ; start autocompletion only after typing
 ;; company mode autocompletion on second character
-(setq company-minimum-prefix-length 2)
+(setq company-minimum-prefix-length 1)
 ;; disable only lowercase in company autocompletion
-(setq company-dabbrev-downcase nil)
-(setq company-require-match nil)
+;;(setq company-dabbrev-downcase nil)
+;;(setq company-require-match nil)
+
+;; disable company annoyance on enter / tab
+(setq tab-always-indent t)
+
+;; ansi-term stuff
+(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+(add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
 
 ;; disable whitespace mode by default
 (global-whitespace-mode 0)
@@ -63,6 +69,8 @@
 ;; magit stuff
 (use-package magit :ensure t)
 (global-set-key (kbd "C-c C-g") 'magit-status)
+(add-hook 'magit-mode-hook (lambda () (local-set-key (kbd "C-o") #'magit-diff-visit-file-other-window)))
+(add-hook 'after-save-hook 'magit-after-save-refresh-status t)
 
 ;; osx fixes
 (when (eq system-type 'darwin)
@@ -125,7 +133,7 @@
 
     ;; The default width and height of the icons is 22 pixels. If you are
     ;; using a Hi-DPI display, uncomment this to double the icon size.
-    (treemacs-resize-icons 12) ;; compile emacs with imagemagic
+    (treemacs-resize-icons 10) ;; compile emacs with imagemagic
 
     (treemacs-follow-mode t)
     (treemacs-filewatch-mode t)
@@ -160,29 +168,67 @@
   :after treemacs magit
   :ensure t)
 
+;; lsp
+;; check supported languages: https://github.com/emacs-lsp/lsp-mode
+;; for ruby: gem install solargraph
+(use-package lsp-mode
+  :ensure t
+  :init (setq lsp-inhibit-message t
+              lsp-eldoc-render-all t
+              lsp-highlight-symbol-at-point nil
+              lsp-keymap-prefix "s-l")
+  :hook (enh-ruby-mode . lsp))
+
+(use-package company-lsp
+  :after  company
+  :ensure t
+  :config
+  (add-hook 'java-mode-hook (lambda () (push 'company-lsp company-backends)))
+  (add-hook 'enh-ruby-mode-hook (lambda () (push 'company-lsp company-backends)))
+  (setq company-lsp-enable-snippet t
+        company-lsp-cache-candidates t))
+
+(use-package lsp-ui
+  :ensure t
+  :config
+  (setq lsp-ui-sideline-enable nil
+        lsp-ui-sideline-update-mode 'point))
+  
+
+(push 'company-lsp company-backends)
+(add-hook 'lsp-mode-hook 'lsp-ui-mode)
+
+(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+(use-package helm-lsp :commands helm-lsp-workspace-symbol)
+
 ;; ruby
 (use-package enh-ruby-mode :ensure t)
-(use-package flymake-ruby :ensure t)
+;;(use-package smartparens-ruby :ensure smartparens)
+;;(use-package flymake-ruby :ensure t)
 (use-package projectile-rails :ensure t)
-(use-package robe :ensure t)
+(setq enh-ruby-add-encoding-comment-on-save nil
+      enh-ruby-deep-indent-paren nil
+      enh-ruby-deep-indent-construct nil
+      enh-ruby-hanging-brace-indent-level 2)
+
+(add-hook 'en-ruby-mode-hook 'flycheck-mode)
+;; robe instead of lsp
+;; (use-package robe :ensure t)
 
 (add-to-list 'auto-mode-alist
              '("\\.\\(?:cap\\|gemspec\\|irbrc\\|gemrc\\|rake\\|rb\\|ru\\|thor\\)\\'" . enh-ruby-mode))
 (add-to-list 'auto-mode-alist
              '("\\(?:Brewfile\\|Capfile\\|Gemfile\\(?:\\.[a-zA-Z0-9._-]+\\)?\\|[rR]akefile\\)\\'" . enh-ruby-mode))
 
-;; remove previous faces for enh-ruby-mode
-(remove-hook 'enh-ruby-mode-hook 'erm-define-faces)
-
 (if (not (getenv "TERM_PROGRAM"))
     (setenv "PATH"
             (shell-command-to-string "source $HOME/.zshrc && printf $PATH")))
 (projectile-rails-global-mode)
 
-(add-hook 'enh-ruby-mode-hook 'flymake-ruby-load)
-(global-set-key (kbd "C-c r r") 'inf-ruby)
+;;(add-hook 'enh-ruby-mode-hook 'flymake-ruby-load)
 
 (add-hook 'enh-ruby-mode-hook 'inf-ruby-minor-mode)
+(global-set-key (kbd "C-c r r") 'inf-ruby)
 
 (use-package ruby-test-mode :ensure t)
 (add-hook 'enh-ruby-mode-hook 'ruby-test-mode)
@@ -192,11 +238,6 @@
 ;;  (goto-char (point-max))
 ;;  (local-set-key (kbd "q")
 ;;                 (lambda () (interactive) (quit-restore-window)))))
-
-;; robe for company and jump to
-(add-hook 'enh-ruby-mode-hook 'robe-mode)
-(eval-after-load 'company
-  '(push 'company-robe company-backends))
 
 ;; rubocop
 (use-package rubocop :ensure t)
@@ -228,7 +269,7 @@
 ;; webmode stuff
 (use-package web-mode)
 (defun my-web-mode-hook ()
-  "Hook for `web-mode'."
+ "Hook for `web-mode'."
   (set (make-local-variable 'company-backends)
        '(company-tern company-web-html company-yasnippet company-files)))
 (add-hook 'web-mode-hook 'my-web-mode-hook)
@@ -297,6 +338,3 @@
 ;; },
 ;; "ecmaVersion": 6
 ;; }
-
-
-
