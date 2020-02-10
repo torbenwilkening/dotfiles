@@ -14,7 +14,9 @@
 (setq use-package-verbose t
       use-package-always-ensure t) ;; makes sure thst every package is available
 
-;; default stuff
+;;;;;;;;;;;;;;;;;
+;; defaults ;;;;;
+;;;;;;;;;;;;;;;;;
 
 (use-package company :ensure t)
 ;;(use-package company-quickhelp :ensure t)
@@ -24,6 +26,10 @@
   :hook (company-mode . company-box-mode))
 ;; go to ~/.emacs.d/elpa/26.1/develop/company-box-xxx/images
 ;; and run mogrify -resize 50% *.png if images are too big
+
+;; syntax highlighting
+(use-package flycheck :ensure t)
+(use-package flymake :ensure t)
 
 ;; default scrollbar
 (scroll-bar-mode -1)
@@ -66,11 +72,11 @@
                 "-o ControlMaster=auto "
                 "-o ControlPersist=no")))
 
-;; magit stuff
-(use-package magit :ensure t)
-(global-set-key (kbd "C-c C-g") 'magit-status)
-(add-hook 'magit-mode-hook (lambda () (local-set-key (kbd "C-o") #'magit-diff-visit-file-other-window)))
-(add-hook 'after-save-hook 'magit-after-save-refresh-status t)
+;; which-key show possible commands in minibuffer
+(use-package which-key
+  :ensure t
+  :diminish which-key-mode
+  :config (which-key-mode))
 
 ;; osx fixes
 (when (eq system-type 'darwin)
@@ -80,12 +86,32 @@
   (setq mac-option-modifier 'meta)
   (setq mac-right-option-modifier nil))
 
+;; disable guru mode by default
+;; M-x customize-option prelude-guru -> disable it
+
+;; only emacs 26
+;;(when (version<= "26.0.50" emacs-version )
+;;  (global-display-line-numbers-mode))
+
 ;; how to disable whitespace mode forever:
 ;; customize-group RET prelude
 ;; prelude-whitespace set to off (default is on)
 
 
-;; treemacs
+;;;;;;;;;;;;;;;;;
+;; magit ;;;;;;;;
+;;;;;;;;;;;;;;;;;
+
+(use-package magit :ensure t)
+(global-set-key (kbd "C-c C-g") 'magit-status)
+(add-hook 'magit-mode-hook (lambda () (local-set-key (kbd "C-o") #'magit-diff-visit-file-other-window)))
+(add-hook 'after-save-hook 'magit-after-save-refresh-status t)
+
+
+;;;;;;;;;;;;;;;;;
+;; treemacs ;;;;;
+;;;;;;;;;;;;;;;;;
+
 (use-package treemacs
   :ensure t
   :defer t
@@ -168,23 +194,130 @@
   :after treemacs magit
   :ensure t)
 
-;; lsp
+
+;;;;;;;;;;;;;;;;;
+;; alltheicons ;;
+;;;;;;;;;;;;;;;;;
+(use-package all-the-icons :ensure t)
+;; to use fonts run M-x 
+;; all-the-icons-install-fonts RET
+
+;;;;;;;;;;;;;;;;;
+;; doom theme ;;;
+;;;;;;;;;;;;;;;;;
+
+(use-package doom-themes
+  :config
+  ;; global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+        doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  (load-theme 'doom-solarized-dark t) ; change theme here (looks good: doom-material doom-one doom-dark+ doom-solarized-dark)
+  ;; enable flashing mode-line on errors
+  (doom-themes-visual-bell-config)
+  ;; or for treemacs users
+  (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
+  (doom-themes-treemacs-config)
+  ;; corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
+
+;; modeline specific
+(use-package doom-modeline
+  :ensure t
+  :hook (after-init . doom-modeline-mode))
+
+;; M-x customize-group RET doom-modeline RET or set the variables
+(setq doom-modeline-buffer-file-name-style 'truncate-upto-project)
+(setq doom-modeline-icon (display-graphic-p))
+(setq doom-modeline-major-mode-color-icon t)
+(setq doom-modeline-buffer-encoding nil)
+(setq doom-modeline-indent-info nil)
+(setq doom-modeline-checker-simple-format t)
+(setq doom-modeline-number-limit 99)
+(setq doom-modeline-vcs-max-length 20)
+(setq doom-modeline-persp-name nil)
+(setq doom-modeline-display-default-persp-name nil)
+(setq doom-modeline-lsp t)
+
+;; Whether display the GitHub notifications. It requires `ghub' package.
+(setq doom-modeline-github nil)
+;;(setq doom-modeline-github-interval (* 30 60))
+(setq doom-modeline-github-interval nil)
+
+;; Whether display the modal state icon.
+;; Including `evil', `overwrite', `god', `ryo' and `xah-fly-keys', etc.
+(setq doom-modeline-modal-icon nil)
+;; Whether display the mu4e notifications. It requires `mu4e-alert' package.
+(setq doom-modeline-mu4e nil)
+;; Whether display the gnus notifications.
+(setq doom-modeline-gnus t)
+;; Wheter gnus should automatically be updated and how often (set to nil to disable)
+;;(setq doom-modeline-gnus-timer 2)
+(setq doom-modeline-gnus-timer nil)
+;; Whether display the IRC notifications. It requires `circe' or `erc' package.
+;;(setq doom-modeline-irc t)
+(setq doom-modeline-irc nil)
+;; Function to stylize the irc buffer names.
+(setq doom-modeline-irc-stylize 'identity)
+
+;; Whether display the environment version.
+(setq doom-modeline-env-version t)
+;; Or for individual languages
+(setq doom-modeline-env-enable-python t)
+(setq doom-modeline-env-enable-ruby t)
+(setq doom-modeline-env-enable-perl t)
+(setq doom-modeline-env-enable-go t)
+(setq doom-modeline-env-enable-elixir t)
+(setq doom-modeline-env-enable-rust t)
+
+;; Change the executables to use for the language version string
+(setq doom-modeline-env-python-executable "python") ; or `python-shell-interpreter'
+(setq doom-modeline-env-ruby-executable "ruby")
+(setq doom-modeline-env-perl-executable "perl")
+(setq doom-modeline-env-go-executable "go")
+(setq doom-modeline-env-elixir-executable "iex")
+(setq doom-modeline-env-rust-executable "rustc")
+
+;; What to dispaly as the version while a new one is being loaded
+(setq doom-modeline-env-load-string "...")
+
+;; Hooks that run before/after the modeline version string is updated
+(setq doom-modeline-before-update-env-hook nil)
+(setq doom-modeline-after-update-env-hook nil)
+
+;;;;;;;;;;;;;;;;;
+;; lsp ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;
+
 ;; check supported languages: https://github.com/emacs-lsp/lsp-mode
 ;; for ruby: gem install solargraph
+;; for python: pip3 install python-language-server 
+;; for vue.js: npm install -g vue-language-server
+;; for typescript: npm i -g javascript-typescript-langserver
+;; for go: go get golang.org/x/tools/gopls@latest
+;; for Dockerfile: npm install -g dockerfile-language-server-nodejs
+;; for less/sass: npm install -g vscode-css-languageserver-bin
+
+
 (use-package lsp-mode
   :ensure t
   :init (setq lsp-inhibit-message t
               lsp-eldoc-render-all t
               lsp-highlight-symbol-at-point nil
               lsp-keymap-prefix "s-l")
-  :hook (enh-ruby-mode . lsp))
+  :hook
+  (enh-ruby-mode . lsp)
+  (scala-mode . lsp)
+  (java-mode . lsp)
+  (python-mode . lsp))
 
 (use-package company-lsp
   :after  company
   :ensure t
   :config
   (add-hook 'java-mode-hook (lambda () (push 'company-lsp company-backends)))
+  (add-hook 'python-mode-hook (lambda () (push 'company-lsp company-backends)))
   (add-hook 'enh-ruby-mode-hook (lambda () (push 'company-lsp company-backends)))
+  (add-hook 'scala-mode-hook (lambda () (push 'company-lsp company-backends)))
   (setq company-lsp-enable-snippet t
         company-lsp-cache-candidates t))
 
@@ -192,8 +325,14 @@
   :ensure t
   :config
   (setq lsp-ui-sideline-enable nil
+        lsp-ui-doc-enable nil
         lsp-ui-sideline-update-mode 'point))
-  
+
+;; keys for find references and definitions to 
+(define-key lsp-ui-mode-map (kbd "C-RET") #'lsp-ui-peek-find-definitions)
+(define-key lsp-ui-mode-map (kbd "<C-return>") #'lsp-ui-peek-find-definitions)
+(define-key lsp-ui-mode-map (kbd "M-RET") #'lsp-ui-peek-find-references)
+(define-key lsp-ui-mode-map (kbd "<M-return>") #'lsp-ui-peek-find-references)
 
 (push 'company-lsp company-backends)
 (add-hook 'lsp-mode-hook 'lsp-ui-mode)
@@ -201,10 +340,14 @@
 (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 (use-package helm-lsp :commands helm-lsp-workspace-symbol)
 
-;; ruby
+
+;;;;;;;;;;;;;;;;;
+;;; ruby ;;;;;;;;
+;;;;;;;;;;;;;;;;;
+
 (use-package enh-ruby-mode :ensure t)
-;;(use-package smartparens-ruby :ensure smartparens)
-;;(use-package flymake-ruby :ensure t)
+(use-package smartparens-ruby :ensure smartparens)
+(use-package flymake-ruby :ensure t)
 (use-package projectile-rails :ensure t)
 (setq enh-ruby-add-encoding-comment-on-save nil
       enh-ruby-deep-indent-paren nil
@@ -212,21 +355,15 @@
       enh-ruby-hanging-brace-indent-level 2)
 
 (add-hook 'en-ruby-mode-hook 'flycheck-mode)
-;; robe instead of lsp
-;; (use-package robe :ensure t)
-
 (add-to-list 'auto-mode-alist
              '("\\.\\(?:cap\\|gemspec\\|irbrc\\|gemrc\\|rake\\|rb\\|ru\\|thor\\)\\'" . enh-ruby-mode))
 (add-to-list 'auto-mode-alist
              '("\\(?:Brewfile\\|Capfile\\|Gemfile\\(?:\\.[a-zA-Z0-9._-]+\\)?\\|[rR]akefile\\)\\'" . enh-ruby-mode))
-
 (if (not (getenv "TERM_PROGRAM"))
     (setenv "PATH"
             (shell-command-to-string "source $HOME/.zshrc && printf $PATH")))
 (projectile-rails-global-mode)
-
-;;(add-hook 'enh-ruby-mode-hook 'flymake-ruby-load)
-
+(add-hook 'enh-ruby-mode-hook 'flymake-ruby-load)
 (add-hook 'enh-ruby-mode-hook 'inf-ruby-minor-mode)
 (global-set-key (kbd "C-c r r") 'inf-ruby)
 
@@ -245,20 +382,41 @@
 ;; ruby settings
 (setq ruby-insert-encoding-magic-comment nil)
 ;; remove default faces for enh-ruby-mode
-(remove-hook 'enh-ruby-mode-hook 'erm-define-faces)
+;; (remove-hook 'enh-ruby-mode-hook 'erm-define-faces)
 
-;; python stuff
-(use-package company-jedi :ensure t)
-(defun my-python-mode-hook ()
-  (add-to-list 'company-backends 'company-jedi)
-  development)
-(add-hook 'python-mode-hook 'my-python-mode-hook)
 
-;; scala stuff
+;;;;;;;;;;;;;;;;;
+;;; python ;;;;;;
+;;;;;;;;;;;;;;;;;
+;; everything already configured with lsp
+
+
+
+;;;;;;;;;;;;;;;;;
+;;; scala ;;;;;;;
+;;;;;;;;;;;;;;;;;
+
 (use-package scala-mode :ensure t)
 (add-to-list 'auto-mode-alist '("\\.scala\\'" . scala-mode))
 
-;; node stuff (js3-mode)
+(use-package sbt-mode
+  :commands sbt-start sbt-command
+  :config
+  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+  ;; allows using SPACE when in the minibuffer
+  (substitute-key-definition
+   'minibuffer-complete-word
+   'self-insert-command
+   minibuffer-local-completion-map)
+  ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
+  (setq sbt:program-options '("-Dsbt.supershell=false"))
+  )
+
+
+;;;;;;;;;;;;;;;;;
+;;; node.js;;;;;;
+;;;;;;;;;;;;;;;;;
+
 (use-package js3-mode :ensure t)
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js3-mode))
 (add-to-list 'company-backends 'company-tern)
@@ -266,7 +424,11 @@
                            (tern-mode)
                            (company-mode)))
 
-;; webmode stuff
+
+;;;;;;;;;;;;;;;;;
+;;; web ;;;;;;;;;
+;;;;;;;;;;;;;;;;;
+
 (use-package web-mode)
 (defun my-web-mode-hook ()
  "Hook for `web-mode'."
@@ -277,7 +439,7 @@
                           (set (make-local-variable 'company-backends) '(company-web-html))
                           (company-mode t)))
 
-;; Enable JavaScript completion between <script>...</script> etc.
+;; enable javascript completion between <script>...</script> etc.
 (advice-add 'company-tern :before
             #'(lambda (&rest _)
                 (if (equal major-mode 'web-mode)
@@ -288,13 +450,22 @@
                           (unless tern-mode (tern-mode))
                         (if tern-mode (tern-mode -1)))))))
 
-;; go stuff
+
+;;;;;;;;;;;;;;;;;
+;;; go ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;
+
 (use-package go-mode)
 (add-hook 'go-mode-hook (lambda ()
                           (set (make-local-variable 'company-backends) '(company-go))
                           (company-mode)))
 
-;; some sql mode fixes
+
+;;;;;;;;;;;;;;;;;
+;;; sql ;;;;;;;;;
+;;;;;;;;;;;;;;;;;
+
+;; some fixes
 (add-hook 'sql-interactive-mode-hook
           (lambda ()
             (toggle-truncate-lines t)))
