@@ -1,7 +1,3 @@
-
-
-;;; init.el ends here
-
 ;;package loading and repos
 (require 'package)
 (setq load-prefer-newer t
@@ -82,6 +78,8 @@
   (global-set-key (kbd "C--")
                   '(lambda () (interactive) (global-text-scale-adjust -1)))
 
+;; org mode 
+(setq org-agenda-files (quote ("~/work.org")))
 
 
 ;;;;;;;;;;;;;;;;;;;;;
@@ -461,6 +459,7 @@
                           (bookmarks . 5)
                           (recents  . 5)))
   (dashboard-setup-startup-hook))
+(add-to-list 'dashboard-items '(agenda) t)
 
 ;; Set the banner
 (setq dashboard-startup-banner "/Users/torbenwilkening/.emacs.d/logo.png")
@@ -502,18 +501,28 @@
 ;; for go: go get golang.org/x/tools/gopls@latest
 ;; for Dockerfile: npm install -g dockerfile-language-server-nodejs
 ;; for less/sass: npm install -g vscode-css-languageserver-bin
+;; for html: npm install -g vscode-html-languageserver-bin
+;; for json: npm i -g vscode-json-languageserver
+;; for yaml: npm install -g yaml-language-server
+
 
 (use-package lsp-mode
   :ensure t
   :init (setq lsp-inhibit-message t
               lsp-eldoc-render-all t
-              lsp-highlight-symbol-at-point nil
+              ;;lsp-highlight-symbol-at-point nil
               lsp-keymap-prefix "s-l")
   :hook
   (ruby-mode . lsp)
   (scala-mode . lsp)
   (java-mode . lsp)
-  (python-mode . lsp))
+  (python-mode . lsp)
+  (yaml-mode . lsp)
+  (json-mode . lsp)
+  (web-mode . lsp)
+  (sh-mode . lsp)
+  (go-mode . lsp)
+  (dockerfile-mode . lsp))
 
 (use-package company-lsp
   :after  company
@@ -523,6 +532,12 @@
   (add-hook 'python-mode-hook (lambda () (push 'company-lsp company-backends)))
   (add-hook 'ruby-mode-hook (lambda () (push 'company-lsp company-backends)))
   (add-hook 'scala-mode-hook (lambda () (push 'company-lsp company-backends)))
+  (add-hook 'yaml-mode-hook (lambda () (push 'company-lsp company-backends)))
+  (add-hook 'json-mode-hook (lambda () (push 'company-lsp company-backends)))
+  (add-hook 'web-mode-hook (lambda () (push 'company-lsp company-backends)))
+  (add-hook 'sh-mode-hook (lambda () (push 'company-lsp company-backends)))
+  (add-hook 'go-mode-hook (lambda () (push 'company-lsp company-backends)))
+  (add-hook 'dockerfile-mode-hook (lambda () (push 'company-lsp company-backends)))
   (setq company-lsp-enable-snippet t
         company-lsp-cache-candidates t))
 
@@ -531,7 +546,12 @@
   :config
   (setq lsp-ui-sideline-enable nil
         lsp-ui-doc-enable nil
-	lsp-ui-sideline-show-diagnostics t
+	;; some sideline tweaks if you want to enable it
+	;; shows only lint and errors in the sideline
+	lsp-ui-sideline-show-code-actions nil
+	lsp-ui-sideline-show-symbol nil
+	lsp-ui-sideline-show-hover t
+	lsp-ui-sideline-show-diagnostics nil
         lsp-ui-sideline-update-mode 'point))
 
 
@@ -575,6 +595,9 @@
   :ensure t
   :mode "\\.yaml\\|\\.yml\\'")
 
+(use-package dockerfile-mode
+  :ensure t
+  :mode "Dockerfile\\'")
 
 (use-package flycheck
   :ensure t
@@ -668,7 +691,9 @@
  '(flycheck-python-pycompile-executable "python3")
  '(flycheck-python-pylint-executable "python3")
  '(lsp-ui-flycheck-list-position (quote right))
- '(lsp-ui-sideline-show-diagnostics t)
+ '(lsp-ui-sideline-ignore-duplicate nil)
+ '(lsp-ui-sideline-show-code-actions nil)
+ '(lsp-ui-sideline-show-diagnostics nil)
  '(lsp-ui-sideline-show-hover t)
  '(package-selected-packages
    (quote
@@ -803,17 +828,4 @@
 ;; "ecmaVersion": 6
 ;; }
 
-;; RUBYOPT=-W0 for no warnings in rspec
 (exec-path-from-shell-copy-env "RUBYOPT")
-
-
-
-;;(add-to-list 'load-path (expand-file-name "~/.emacs.d/emacs-livedown"))
-;;(require 'livedown)
-
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
