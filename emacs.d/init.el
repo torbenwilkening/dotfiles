@@ -64,8 +64,6 @@
 (global-set-key (kbd "C-3") 'split-window-horizontally)
 (global-set-key (kbd "C-2") 'split-window-vertically)
 (global-set-key (kbd "C-1") 'delete-other-windows)
-(global-unset-key (kbd "C-m"))
-(global-set-key (kbd "C-m") 'delete-other-windows)
 (global-set-key (kbd "C-0") 'delete-window)
 
 (global-set-key (kbd "C-p") 'previous-buffer)
@@ -752,16 +750,16 @@
   ((:color blue :quit-key "q")
    (
     "Ruby"
-    (("r" rubocop-mode-check-project "Check Rubocop" :toggle t)
-     ("i" inf-ruby "REPL" :toggle t)
-     ("g" projectile-rails-goto-gemfile :toggle nil)
-     )
+    (("r" rubocop-mode-check-project "Check Rubocop" :toggle nil)
+     ("j" projectile-goto-file-at-point "Jump to Definition" :toggle nil)
+     ("i" inf-ruby "REPL" :toggle nil))
    "Rails"
-    (("s" projectile-rails-server "Rails Server" :toggle t)
-     ("c" projectile-rails-console "Rails Console" :toggle t)
-     ("R" rake "Rake Task" :toggle t))
+    (("s" projectile-rails-server "Rails Server" :toggle nil)
+     ("c" projectile-rails-console "Rails Console" :toggle nil)
+     ("g" projectile-rails-goto-gemfile "Go to Gemfile" :toggle nil)
+     ("R" rake "Rake Task" :toggle nil))
     "RSpec"
-    (("j" projectile-rails-find-current-spec "Go to Spec" :toggle nil)
+    (("J" projectile-rails-find-current-spec "Go to Spec" :toggle nil)
      ("t" ruby-test-mode-run-at-point "Run at point" :toggle nil)
      ("T" ruby-test-mode-run "Run all" :toggle nil))))
    :bind ("C-r" . enh-ruby-mode-hydra/body)
@@ -946,4 +944,3 @@
 ;; },
 ;; "ecmaVersion": 6
 ;; }
-
