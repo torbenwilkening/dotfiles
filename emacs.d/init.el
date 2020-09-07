@@ -64,27 +64,41 @@
 (global-set-key (kbd "C-3") 'split-window-horizontally)
 (global-set-key (kbd "C-2") 'split-window-vertically)
 (global-set-key (kbd "C-1") 'delete-other-windows)
+(global-unset-key (kbd "C-m"))
+(global-set-key (kbd "C-m") 'delete-other-windows)
 (global-set-key (kbd "C-0") 'delete-window)
+
+(global-set-key (kbd "C-p") 'previous-buffer)
+(global-set-key (kbd "C-n") 'next-buffer)
 
 ;; projectile
 (global-set-key (kbd "C-c p s") 'projectile-switch-project)
 
+;; debug keys
+(global-set-key (kbd "C-d") 'dap-hydra)
+
+;; text scaling
+(defhydra hydra-zoom (global-map "C-+")
+  "zoom"
+  ("+" text-scale-increase "in")
+  ("-" text-scale-decrease "out"))
+
 ;; scaling of text
-(define-globalized-minor-mode
-    global-text-scale-mode
-    text-scale-mode
-    (lambda () (text-scale-mode 1)))
+;;(define-globalized-minor-mode
+;;    global-text-scale-mode
+;;    text-scale-mode
+;;    (lambda () (text-scale-mode 1)))
   
-  (defun global-text-scale-adjust (inc) (interactive)
-    (text-scale-set 1)
-    (kill-local-variable 'text-scale-mode-amount)
-    (setq-default text-scale-mode-amount (+ text-scale-mode-amount inc))
-    (global-text-scale-mode 1)
-    )
-  (global-set-key (kbd "C-+")
-                  '(lambda () (interactive) (global-text-scale-adjust 1)))
-  (global-set-key (kbd "C--")
-                  '(lambda () (interactive) (global-text-scale-adjust -1)))
+;;  (defun global-text-scale-adjust (inc) (interactive)
+;;    (text-scale-set 1)
+;;    (kill-local-variable 'text-scale-mode-amount)
+;;    (setq-default text-scale-mode-amount (+ text-scale-mode-amount inc))
+;;    (global-text-scale-mode 1)
+;;    )
+;;  (global-set-key (kbd "C-+")
+;;                  '(lambda () (interactive) (global-text-scale-adjust 1)))
+;;  (global-set-key (kbd "C--")
+;;                  '(lambda () (interactive) (global-text-scale-adjust -1)))
 
 ;; org mode
 (setq org-agenda-files (quote ("~/work.org")))
@@ -652,11 +666,11 @@
 
 ;; dap-ruby
 
-(use-package dap-ruby :after dap-mode)
+(require 'dap-ruby)
 ;; call dap-ruby-setup
 
 ;; dap-python
-(use-package dap-python :after dap-mode)
+(require 'dap-python)
 
 
 
@@ -721,13 +735,45 @@
 ;;;;;;;;;;;;;;;;;
 ;;; ruby ;;;;;;;;
 ;;;;;;;;;;;;;;;;;
+(use-package pretty-hydra :ensure t)
 
-(use-package enh-ruby-mode :ensure t)
-;;(use-package ruby-mode :ensure t)
+
+
+(global-unset-key (kbd "C-r"))
+
+(use-package enh-ruby-mode
+  :ensure t
+;;  :bind (("C-r c" . inf-ruby)
+;;	 ("C-r f" . projectile-rails-goto-file-at-point)
+;;	 ("C-r t" . ruby-test-run-at-point)
+;;	 ("C-r r" . rake)
+  ;;	 ("C-r s" . projectile-rails-find-current-spec))
+  :pretty-hydra
+  ((:color blue :quit-key "q")
+   (
+    "Ruby"
+    (("r" rubocop-mode-check-project "Check Rubocop" :toggle t)
+     ("i" inf-ruby "REPL" :toggle t)
+     ("g" projectile-rails-goto-gemfile :toggle nil)
+     )
+   "Rails"
+    (("s" projectile-rails-server "Rails Server" :toggle t)
+     ("c" projectile-rails-console "Rails Console" :toggle t)
+     ("R" rake "Rake Task" :toggle t))
+    "RSpec"
+    (("j" projectile-rails-find-current-spec "Go to Spec" :toggle nil)
+     ("t" ruby-test-mode-run-at-point "Run at point" :toggle nil)
+     ("T" ruby-test-mode-run "Run all" :toggle nil))))
+   :bind ("C-r" . enh-ruby-mode-hydra/body)
+  )
+
 (use-package smartparens-ruby :ensure smartparens)
-;;(use-package flymake-ruby :ensure t)
 (use-package ruby-test-mode :ensure t)
 (use-package rubocop :ensure t)
+(use-package bundler :ensure t)
+(use-package rbenv :ensure t)
+(use-package rake :ensure t)
+
 
 (sp-with-modes '(rhtml-mode)
   (sp-local-pair "<" ">")
@@ -744,8 +790,6 @@
     (setenv "PATH"
             (shell-command-to-string "source $HOME/.zshrc && printf $PATH")))
 
-(global-set-key (kbd "C-c r r") 'inf-ruby)
-
 (add-to-list 'load-path "~/.emacs.d/vendor")
 
 ;; ruby mode
@@ -757,7 +801,7 @@
 (add-hook 'enh-ruby-mode-hook 'flycheck-mode)
 (add-hook 'enh-ruby-mode-hook 'ruby-test-mode)
 (add-hook 'enh-ruby-mode-hook #'rubocop-mode)
-
+(add-hook 'after-init-hook 'inf-ruby-switch-setup) ;; enable byebug and pry
 ;; ruby settings
 (setq ruby-insert-encoding-magic-comment nil)
 ;; remove default faces for enh-ruby-mode
