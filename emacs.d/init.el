@@ -939,35 +939,5 @@
 ;; "ecmaVersion": 6
 ;; }
 
-;; sumcumo specific
-
-(exec-path-from-shell-copy-env "ERGO_DATABASE_HOST")
-(exec-path-from-shell-copy-env "ERGO_DATABASE_USER")
-(exec-path-from-shell-copy-env "ERGO_DATABASE_PASSWORD")
-
-;;(exec-path-from-shell-copy-env "MYSQL_HOST")
-;;(exec-path-from-shell-copy-env "MYSQL_USER")
-;;(exec-path-from-shell-copy-env "MYSQL_PASSWORD")
-
-(exec-path-from-shell-copy-env "SILENCE_SCIP_DEPRECATIONS")
-
-;;(exec-path-from-shell-copy-env "CAR_SCIP_MYSQL_USER")
-;;(exec-path-from-shell-copy-env "CAR_SCIP_MYSQL_PASSWORD")
-
 (exec-path-from-shell-copy-env "RUBYOPT")
 (exec-path-from-shell-copy-env "RAILS_ENV")
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (major-mode-hydra pretty-hydra rbenv bundler graphql-mode scss-mode html-mode yaml-mode which-key web-mode use-package undo-tree treemacs-projectile treemacs-magit treemacs-icons-dired tide smartparens shell-pop scala-mode sbt-mode ruby-test-mode rubocop projectile-rails nlinum multiple-cursors mermaid-mode lsp-ui lsp-ivy json-mode js3-mode groovy-mode go-mode git-timemachine git-gutter-fringe flycheck-color-mode-line exec-path-from-shell enh-ruby-mode doom-themes doom-modeline dockerfile-mode dashboard dap-mode counsel-projectile company-box circe ag))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
