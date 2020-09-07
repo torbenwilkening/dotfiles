@@ -745,17 +745,16 @@
    (
     "Ruby"
     (("r" rubocop-mode-check-project "Check Rubocop" :toggle nil)
-     ("j" projectile-goto-file-at-point "Jump to Definition" :toggle nil)
      ("i" inf-ruby "REPL" :toggle nil))
    "Rails"
     (("s" projectile-rails-server "Rails Server" :toggle nil)
      ("c" projectile-rails-console "Rails Console" :toggle nil)
-     ("g" projectile-rails-goto-gemfile "Go to Gemfile" :toggle nil)
+     ("G" projectile-rails-goto-gemfile "Go to Gemfile" :toggle nil)
      ("R" rake "Rake Task" :toggle nil))
     "RSpec"
-    (("J" projectile-rails-find-current-spec "Go to Spec" :toggle nil)
-     ("t" ruby-test-mode-run-at-point "Run at point" :toggle nil)
-     ("T" ruby-test-mode-run "Run all" :toggle nil))))
+    (("j" projectile-rails-find-current-spec "Go to Spec" :toggle nil)
+     ("t" ruby-test-run-at-point "Run at point" :toggle nil)
+     ("T" ruby-test-run "Run all" :toggle nil))))
    :bind ("C-r" . enh-ruby-mode-hydra/body)
   )
 
@@ -939,5 +938,3 @@
 ;; "ecmaVersion": 6
 ;; }
 
-(exec-path-from-shell-copy-env "RUBYOPT")
-(exec-path-from-shell-copy-env "RAILS_ENV")
