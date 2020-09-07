@@ -1,3 +1,5 @@
+;;; init.el ends here
+
 ;;package loading and repos
 (require 'package)
 (setq load-prefer-newer t
@@ -20,6 +22,7 @@
 ;;;;;;;;;;;;;;;;;
 ;; defaults ;;;;;
 ;;;;;;;;;;;;;;;;;
+(add-to-list 'default-frame-alist '(ns-appearance . dark))
 
 ;; backups/saves
 (setq make-backup-files nil)
@@ -51,15 +54,20 @@
 
 ;; ibuffer with focus
 (global-set-key (kbd "C-x C-b") 'ibuffer)
+(global-set-key (kbd "C-b") 'ibuffer)
 
 ;; recent files selection
 (global-set-key (kbd "C-c f") 'recentf-open-more-files)
+(global-set-key (kbd "C-S-s") 'ag-project)
 
 ;; window splitting
 (global-set-key (kbd "C-3") 'split-window-horizontally)
 (global-set-key (kbd "C-2") 'split-window-vertically)
 (global-set-key (kbd "C-1") 'delete-other-windows)
 (global-set-key (kbd "C-0") 'delete-window)
+
+;; projectile
+(global-set-key (kbd "C-c p s") 'projectile-switch-project)
 
 ;; scaling of text
 (define-globalized-minor-mode
@@ -78,8 +86,21 @@
   (global-set-key (kbd "C--")
                   '(lambda () (interactive) (global-text-scale-adjust -1)))
 
-;; org mode 
+;; org mode
 (setq org-agenda-files (quote ("~/work.org")))
+
+;; multi cursor
+(use-package multiple-cursors :ensure t)
+(global-set-key (kbd "C->") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+
+
+;; shell
+;;Use M-x customize-variable RET shell-pop-shell-type RET to customize the shell to use. Four pre-set options are: shell, terminal, ansi-term, and eshell. You can also set your custom shell if you use other configuration
+(use-package shell-pop :ensure t)
+
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;
@@ -95,9 +116,11 @@
   (setq company-tooltip-limit 20
 	company-idle-delay .1
 	company-echo-delay 0
+	completion-ignore-case nil
 	company-minimum-prefix-length 1 ; only after first character
 	company-begin-commands '(self-insert-command))) ; only after typing
 (setq-local company-dabbrev-downcase nil)  ;; removed downcase annoyance
+
 
 (use-package company-box
   :init (setq company-box-enable-icon (display-graphic-p))
@@ -115,16 +138,16 @@
   :config
   (add-hook 'flycheck-mode-hook 'flycheck-color-mode-line-mode))
 
-(use-package flycheck-pos-tip
-  :ensure t
-  :config
-  (eval-after-load 'flycheck
-    '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
+;;(use-package flycheck-pos-tip
+;;  :ensure t
+;;  :config
+;;  (eval-after-load 'flycheck
+;;    '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
 
-(use-package flymake-diagnostic-at-point
-  :after flymake
-  :config
-  (add-hook 'flymake-mode-hook #'flymake-diagnostic-at-point-mode))
+;;(use-package flymake-diagnostic-at-point
+;;  :after flymake
+;;  :config
+;;  (add-hook 'flymake-mode-hook #'flymake-diagnostic-at-point-mode))
 
 
 ;; default scrollbar
@@ -158,6 +181,10 @@
   :ensure t
   :diminish which-key-mode
   :config (which-key-mode))
+
+;; yes or no to y or n
+(fset 'yes-or-no-p 'y-or-n-p)
+
 
 ;; osx fixes
 (when (eq system-type 'darwin)
@@ -268,6 +295,14 @@
 (global-set-key (kbd "C-c C-g") 'magit-status)
 (add-hook 'magit-mode-hook (lambda () (local-set-key (kbd "C-o") #'magit-diff-visit-file-other-window)))
 (add-hook 'after-save-hook 'magit-after-save-refresh-status t)
+
+(defun blame ()
+  (interactive)
+  (when magit-buffer-file-name
+    (user-error "Blob buffers aren't supported"))
+  (setq-local magit-blame-show-headings nil)
+  (let ((magit-blame-read-only nil))
+    (magit-blame)))
 
 
 ;;;;;;;;;;;;;;;;;
@@ -462,7 +497,7 @@
 (add-to-list 'dashboard-items '(agenda) t)
 
 ;; Set the banner
-(setq dashboard-startup-banner "/Users/torbenwilkening/.emacs.d/logo.png")
+(setq dashboard-startup-banner "~/.logo.png")
 ;; Value can be
 ;; 'official which displays the official emacs logo
 ;; 'logo which displays an alternative emacs logo
@@ -470,7 +505,14 @@
 ;; "path/to/your/image.png" which displays whatever image you would prefer
 (setq dashboard-center-content t)
 
-
+;(use-package hydra
+;  :ensure t
+;  :defer t
+;  :init
+;  (defhydra hydra-zoom (global-map "<f2>")
+;    "zoom"
+;    ("g" text-scale-increase)
+;    ("l" text-scale-decrease)))
 
 ;; Show new mails in modeline
 ;; (use-package mu4e-alert :ensure t)
@@ -510,13 +552,17 @@
   :ensure t
   :init (setq lsp-inhibit-message t
               lsp-eldoc-render-all t
-              ;;lsp-highlight-symbol-at-point nil
               lsp-keymap-prefix "s-l")
   :hook
-  (ruby-mode . lsp)
+  (html-mode . lsp)
+  (css-mode . lsp)
+  (less-css-mode . lsp)
+  (scss-mode . lsp)
+  (enh-ruby-mode . lsp)
   (scala-mode . lsp)
   (java-mode . lsp)
   (python-mode . lsp)
+  (groovy-mode . lsp)
   (yaml-mode . lsp)
   (json-mode . lsp)
   (web-mode . lsp)
@@ -524,35 +570,51 @@
   (go-mode . lsp)
   (dockerfile-mode . lsp))
 
-(use-package company-lsp
-  :after  company
-  :ensure t
-  :config
-  (add-hook 'java-mode-hook (lambda () (push 'company-lsp company-backends)))
-  (add-hook 'python-mode-hook (lambda () (push 'company-lsp company-backends)))
-  (add-hook 'ruby-mode-hook (lambda () (push 'company-lsp company-backends)))
-  (add-hook 'scala-mode-hook (lambda () (push 'company-lsp company-backends)))
-  (add-hook 'yaml-mode-hook (lambda () (push 'company-lsp company-backends)))
-  (add-hook 'json-mode-hook (lambda () (push 'company-lsp company-backends)))
-  (add-hook 'web-mode-hook (lambda () (push 'company-lsp company-backends)))
-  (add-hook 'sh-mode-hook (lambda () (push 'company-lsp company-backends)))
-  (add-hook 'go-mode-hook (lambda () (push 'company-lsp company-backends)))
-  (add-hook 'dockerfile-mode-hook (lambda () (push 'company-lsp company-backends)))
-  (setq company-lsp-enable-snippet t
-        company-lsp-cache-candidates t))
-
 (use-package lsp-ui
   :ensure t
   :config
-  (setq lsp-ui-sideline-enable nil
-        lsp-ui-doc-enable nil
+  (setq lsp-ui-sideline-enable t
+        lsp-ui-doc-enable t
+
+	;;lsp-ui-doc-enable nil
 	;; some sideline tweaks if you want to enable it
 	;; shows only lint and errors in the sideline
-	lsp-ui-sideline-show-code-actions nil
-	lsp-ui-sideline-show-symbol nil
+	;;lsp-ui-sideline-show-code-actions nil
+	;;lsp-ui-sideline-show-symbol nil
+
+	lsp-ui-sideline-show-code-actions t
+	lsp-ui-sideline-show-symbol t
+	lsp-ui-sideline-show-diagnostics t
 	lsp-ui-sideline-show-hover t
-	lsp-ui-sideline-show-diagnostics nil
+
+	lsp-eldoc-hook nil ;; disable in minibuffer
+	
+	;;lsp-ui-sideline-show-hover t
+	;;lsp-ui-sideline-show-diagnostics nil
         lsp-ui-sideline-update-mode 'point))
+
+(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+
+;;(use-package company-lsp
+;;  :after  company
+;;  :ensure t
+;;  :config
+;;  (add-hook 'java-mode-hook (lambda () (push 'company-lsp company-backends)))
+;;  (add-hook 'python-mode-hook (lambda () (push 'company-lsp company-backends)))
+;;  (add-hook 'groovy-mode-hook (lambda () (push 'company-lsp company-backends)))
+  ;;(add-hook 'ruby-mode-hook (lambda () (push 'company-lsp company-backends)))
+;;  (add-hook 'enh-ruby-mode-hook (lambda () (push 'company-lsp company-backends)))
+;;  (add-hook 'scala-mode-hook (lambda () (push 'company-lsp company-backends)))
+;;  (add-hook 'yaml-mode-hook (lambda () (push 'company-lsp company-backends)))
+;;  (add-hook 'json-mode-hook (lambda () (push 'company-lsp company-backends)))
+;;  (add-hook 'web-mode-hook (lambda () (push 'company-lsp company-backends)))
+;;  (add-hook 'sh-mode-hook (lambda () (push 'company-lsp company-backends)))
+;;  (add-hook 'go-mode-hook (lambda () (push 'company-lsp company-backends)))
+;;  (add-hook 'dockerfile-mode-hook (lambda () (push 'company-lsp company-backends)))
+;;  (setq company-lsp-enable-snippet t
+;;        company-lsp-cache-candidates t))
+
 
 
 ;; keys for find references and definitions to 
@@ -561,35 +623,62 @@
 (define-key lsp-ui-mode-map (kbd "M-RET") #'lsp-ui-peek-find-references)
 (define-key lsp-ui-mode-map (kbd "<M-return>") #'lsp-ui-peek-find-references)
 
-(push 'company-lsp company-backends)
-(add-hook 'lsp-mode-hook 'lsp-ui-mode)
+;;(push 'company-lsp company-backends)
+;;(add-hook 'lsp-mode-hook 'lsp-ui-mode)
 
 ;; flycheck lsp
-(require 'lsp-ui-flycheck)
-(with-eval-after-load 'lsp-mode
-  (add-hook 'lsp-after-open-hook (lambda () (lsp-ui-flycheck-enable t))))
+;;(require 'lsp-ui-flycheck)
+;;(with-eval-after-load 'lsp-mode
+;;  (add-hook 'lsp-after-open-hook (lambda () (lsp-flycheck-enable t))))
 
-(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
-(use-package helm-lsp :commands helm-lsp-workspace-symbol)
+;;(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+
+;;(use-package helm-lsp :commands helm-lsp-workspace-symbol)
 
 ;;;;;;;;;;;;;;;;;
 ;;; dap-mode ;;;;
 ;;;;;;;;;;;;;;;;;
 (use-package dap-mode :ensure t)
-(dap-mode 1)
+
 (dap-ui-mode 1)
 ;; enables mouse hover support
 (dap-tooltip-mode 1)
 ;; use tooltips for mouse hover
 ;; if it is not enabled `dap-mode' will use the minibuffer.
 (tooltip-mode 1)
-;; for each language, you need a setup:
-;; https://github.com/emacs-lsp/dap-mode
+;; displays floating panel with debug buttons
+;; requies emacs 26+
+(dap-ui-controls-mode 1)
+
+;; dap-ruby
+
+(use-package dap-ruby :after dap-mode)
+;; call dap-ruby-setup
+
+;; dap-python
+(use-package dap-python :after dap-mode)
+
+
+
 
 
 (use-package markdown-mode
   :ensure t
   :mode "\\.md\\'")
+
+
+(add-to-list 'auto-mode-alist '("\\.html\\'" . html-mode))
+
+
+(use-package css-mode
+  :ensure t
+  :mode "\\.css\\'")
+
+
+(use-package scss-mode
+  :ensure t
+  :mode "\\.scss\\'")
+
 
 (use-package yaml-mode
   :ensure t
@@ -599,10 +688,16 @@
   :ensure t
   :mode "Dockerfile\\'")
 
-(use-package flycheck
+(use-package json-mode
   :ensure t
-  :config
-  (add-hook 'after-init-hook #'global-flycheck-mode))
+  :mode "\\.json")
+
+(use-package graphql-mode
+  :ensure t)
+
+;;(use-package flycheck :ensure t
+;;  :config
+;;  (add-hook 'after-init-hook #'global-flycheck-mode))
 
 (use-package flycheck-color-mode-line
   :ensure t
@@ -610,94 +705,64 @@
   (add-hook 'flycheck-mode-hook 'flycheck-color-mode-line-mode))
 
 
+;; auto add end and close parens
+(use-package smartparens :ensure t)
+(require 'smartparens-config)
+(smartparens-global-mode)
+(show-smartparens-global-mode t)
+
+
+;;;;;;;;;;;;;;;;;
+;;; groovy;;;;;;;
+;;;;;;;;;;;;;;;;;
+(use-package groovy-mode :ensure t)
+
+
 ;;;;;;;;;;;;;;;;;
 ;;; ruby ;;;;;;;;
 ;;;;;;;;;;;;;;;;;
 
 (use-package enh-ruby-mode :ensure t)
-(use-package ruby-mode :ensure t)
-(require 'smartparens-config)
+;;(use-package ruby-mode :ensure t)
 (use-package smartparens-ruby :ensure smartparens)
+;;(use-package flymake-ruby :ensure t)
+(use-package ruby-test-mode :ensure t)
+(use-package rubocop :ensure t)
+
 (sp-with-modes '(rhtml-mode)
   (sp-local-pair "<" ">")
   (sp-local-pair "<%" "%>"))
 
 (use-package projectile-rails :ensure t)
+(projectile-rails-global-mode)
 (setq enh-ruby-add-encoding-comment-on-save nil
       enh-ruby-deep-indent-paren nil
       enh-ruby-deep-indent-construct nil
       enh-ruby-hanging-brace-indent-level 2)
 
-(add-to-list 'auto-mode-alist
-             '("\\.\\(?:cap\\|gemspec\\|irbrc\\|gemrc\\|rake\\|rb\\|ru\\|thor\\)\\'" . ruby-mode))
-(add-to-list 'auto-mode-alist
-             '("\\(?:Brewfile\\|Capfile\\|Gemfile\\(?:\\.[a-zA-Z0-9._-]+\\)?\\|[rR]akefile\\)\\'" . ruby-mode))
 (if (not (getenv "TERM_PROGRAM"))
     (setenv "PATH"
             (shell-command-to-string "source $HOME/.zshrc && printf $PATH")))
-(projectile-rails-global-mode)
+
 (global-set-key (kbd "C-c r r") 'inf-ruby)
 
-(use-package flymake-ruby :ensure t)
-(add-hook 'ruby-mode-hook 'flymake-ruby-load)
+(add-to-list 'load-path "~/.emacs.d/vendor")
 
-
-(add-hook 'ruby-mode-hook 'inf-ruby-minor-mode)
-(add-hook 'ruby-mode-hook 'flycheck-mode)
-(add-hook 'ruby-mode-hook 'nlinum-mode)
-
-(use-package ruby-test-mode :ensure t)
-(add-hook 'ruby-mode-hook 'ruby-test-mode)
-;;(lambda (buf strg)
-;;  (switch-to-buffer-other-window "*compilation*")
-;;  (read-only-mode)
-;;  (goto-char (point-max))
-;;  (local-set-key (kbd "q")
-;;                 (lambda () (interactive) (quit-restore-window)))))
-
-;; rubocop
-(use-package rubocop :ensure t)
-(add-to-list 'load-path "~/.emacs.d/vendor") ; mkdir -p ~/.emacs.d/vendor
-;; download rubocop.el and put it to the load path: 
-;; wget https://raw.githubusercontent.com/rubocop-hq/rubocop-emacs/master/rubocop.el ~/.emacs.d/vendor
-(add-hook 'ruby-mode-hook #'rubocop-mode)
+;; ruby mode
+(add-to-list 'auto-mode-alist
+             '("\\.\\(?:cap\\|gemspec\\|irbrc\\|gemrc\\|rake\\|rb\\|ru\\|thor\\)\\'" . enh-ruby-mode))
+(add-to-list 'auto-mode-alist
+             '("\\(?:Brewfile\\|Capfile\\|Gemfile\\(?:\\.[a-zA-Z0-9._-]+\\)?\\|[rR]akefile\\)\\'" . enh-ruby-mode))
+(add-hook 'enh-ruby-mode-hook 'inf-ruby-minor-mode)
+(add-hook 'enh-ruby-mode-hook 'flycheck-mode)
+(add-hook 'enh-ruby-mode-hook 'ruby-test-mode)
+(add-hook 'enh-ruby-mode-hook #'rubocop-mode)
 
 ;; ruby settings
 (setq ruby-insert-encoding-magic-comment nil)
 ;; remove default faces for enh-ruby-mode
 ;;(remove-hook 'enh-ruby-mode-hook 'erm-define-faces)
 
-;; auto add end 
-(smartparens-global-mode)
-(show-smartparens-global-mode t)
-
-;; ruby debugging
-(require 'dap-ruby)
-;; call dap-ruby-setup
-
-
-
-;;;;;;;;;;;;;;;;;
-;;; python ;;;;;;
-;;;;;;;;;;;;;;;;;
-(require 'dap-python)
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(doom-modeline-irc-buffers t)
- '(flycheck-python-flake8-executable "python3")
- '(flycheck-python-pycompile-executable "python3")
- '(flycheck-python-pylint-executable "python3")
- '(lsp-ui-flycheck-list-position (quote right))
- '(lsp-ui-sideline-ignore-duplicate nil)
- '(lsp-ui-sideline-show-code-actions nil)
- '(lsp-ui-sideline-show-diagnostics nil)
- '(lsp-ui-sideline-show-hover t)
- '(package-selected-packages
-   (quote
-    (tide flymake-diagnostic-at-point flymake-cursor ruby-electric all-the-icons-ivy which-key web-mode use-package treemacs-projectile treemacs-magit treemacs-icons-dired smartparens scala-mode sbt-mode ruby-test-mode rubocop projectile-rails lsp-ui js3-mode helm-lsp go-mode flycheck exec-path-from-shell enh-ruby-mode doom-themes doom-modeline dap-mode company-lsp company-box))))
 
 ;;;;;;;;;;;;;;;;;
 ;;; scala ;;;;;;;
@@ -768,15 +833,25 @@
 ;;                          (unless tern-mode (tern-mode))
 ;;                        (if tern-mode (tern-mode -1)))))))
 
+;;;;;;;;;;;;;;;;;
+;;; mermaid js ;;
+;;;;;;;;;;;;;;;;;
+
+;; install mermaid cli: https://github.com/mermaidjs/mermaid.cli
+(use-package mermaid-mode :ensure t)
+;; open mmd files and start mermaid mode
+;; useful shortcuts in mermaid-mode
+;; C-c C-c to compile to an image
+;; C-c C-o to open in the live editor
+;; C-c C-d to open the official doc
+
 
 ;;;;;;;;;;;;;;;;;
 ;;; go ;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;
 
-(use-package go-mode)
-;;(add-hook 'go-mode-hook (lambda ()
-;;                          (set (make-local-variable 'company-backends) '(company-go))
-;;                          (company-mode)))
+(use-package go-mode :ensure t)
+
 
 
 ;;;;;;;;;;;;;;;;;
@@ -828,4 +903,3 @@
 ;; "ecmaVersion": 6
 ;; }
 
-(exec-path-from-shell-copy-env "RUBYOPT")
