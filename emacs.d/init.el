@@ -75,11 +75,6 @@
 ;; debug keys
 (global-set-key (kbd "C-d") 'dap-hydra)
 
-;; text scaling
-(defhydra hydra-zoom (global-map "C-+")
-  "zoom"
-  ("+" text-scale-increase "in")
-  ("-" text-scale-decrease "out"))
 
 ;; scaling of text
 ;;(define-globalized-minor-mode
@@ -125,11 +120,11 @@
   :defer t
   :init (global-company-mode t)
   :config
-  (setq company-tooltip-limit 20
+  (setq company-tooltip-limit 10
 	company-idle-delay .1
 	company-echo-delay 0
 	completion-ignore-case nil
-	company-minimum-prefix-length 1 ; only after first character
+	company-minimum-prefix-length 2 ; only after first character
 	company-begin-commands '(self-insert-command))) ; only after typing
 (setq-local company-dabbrev-downcase nil)  ;; removed downcase annoyance
 
@@ -540,6 +535,11 @@
 ;; (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
 
 
+;; text scaling
+(defhydra hydra-zoom (global-map "C-+")
+  "zoom"
+  ("+" text-scale-increase "in")
+  ("-" text-scale-decrease "out"))
 
 
 
@@ -581,28 +581,22 @@
   (sh-mode . lsp)
   (go-mode . lsp)
   (dockerfile-mode . lsp))
+ 
 
 (use-package lsp-ui
   :ensure t
   :config
   (setq lsp-ui-sideline-enable t
         lsp-ui-doc-enable t
-
-	;;lsp-ui-doc-enable nil
+	
 	;; some sideline tweaks if you want to enable it
 	;; shows only lint and errors in the sideline
-	;;lsp-ui-sideline-show-code-actions nil
-	;;lsp-ui-sideline-show-symbol nil
-
-	lsp-ui-sideline-show-code-actions t
-	lsp-ui-sideline-show-symbol t
-	lsp-ui-sideline-show-diagnostics t
-	lsp-ui-sideline-show-hover t
-
-	lsp-eldoc-hook nil ;; disable in minibuffer
+	lsp-ui-sideline-show-code-actions nil
+	lsp-ui-sideline-show-symbol nil
 	
-	;;lsp-ui-sideline-show-hover t
-	;;lsp-ui-sideline-show-diagnostics nil
+	lsp-ui-sideline-show-diagnostics t
+	lsp-ui-sideline-show-hover nil
+	lsp-eldoc-hook nil ;; disable in minibuffer
         lsp-ui-sideline-update-mode 'point))
 
 (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
@@ -944,3 +938,36 @@
 ;; },
 ;; "ecmaVersion": 6
 ;; }
+
+;; sumcumo specific
+
+(exec-path-from-shell-copy-env "ERGO_DATABASE_HOST")
+(exec-path-from-shell-copy-env "ERGO_DATABASE_USER")
+(exec-path-from-shell-copy-env "ERGO_DATABASE_PASSWORD")
+
+;;(exec-path-from-shell-copy-env "MYSQL_HOST")
+;;(exec-path-from-shell-copy-env "MYSQL_USER")
+;;(exec-path-from-shell-copy-env "MYSQL_PASSWORD")
+
+(exec-path-from-shell-copy-env "SILENCE_SCIP_DEPRECATIONS")
+
+;;(exec-path-from-shell-copy-env "CAR_SCIP_MYSQL_USER")
+;;(exec-path-from-shell-copy-env "CAR_SCIP_MYSQL_PASSWORD")
+
+(exec-path-from-shell-copy-env "RUBYOPT")
+(exec-path-from-shell-copy-env "RAILS_ENV")
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (major-mode-hydra pretty-hydra rbenv bundler graphql-mode scss-mode html-mode yaml-mode which-key web-mode use-package undo-tree treemacs-projectile treemacs-magit treemacs-icons-dired tide smartparens shell-pop scala-mode sbt-mode ruby-test-mode rubocop projectile-rails nlinum multiple-cursors mermaid-mode lsp-ui lsp-ivy json-mode js3-mode groovy-mode go-mode git-timemachine git-gutter-fringe flycheck-color-mode-line exec-path-from-shell enh-ruby-mode doom-themes doom-modeline dockerfile-mode dashboard dap-mode counsel-projectile company-box circe ag))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
