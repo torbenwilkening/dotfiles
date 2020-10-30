@@ -6,7 +6,7 @@
       package-enable-at-startup nil
       package-archives
       '(("gnu" . "https://elpa.gnu.org/packages/")
-        ("org" . "http://orgmode.org/elpa/")
+        ("org" . "https://orgmode.org/elpa/")
         ("melpa" . "https://melpa.org/packages/")))
 (package-initialize)
 (unless (package-installed-p 'use-package)
@@ -55,6 +55,7 @@
 ;; ibuffer with focus
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key (kbd "C-b") 'ibuffer)
+(global-set-key (kbd "M-b") 'switch-to-buffer)
 
 ;; recent files selection
 (global-set-key (kbd "C-c f") 'recentf-open-more-files)
@@ -77,21 +78,22 @@
 
 
 ;; scaling of text
-;;(define-globalized-minor-mode
-;;    global-text-scale-mode
-;;    text-scale-mode
-;;    (lambda () (text-scale-mode 1)))
+(define-globalized-minor-mode
+    global-text-scale-mode
+    text-scale-mode
+    (lambda () (text-scale-mode 1)))
   
-;;  (defun global-text-scale-adjust (inc) (interactive)
-;;    (text-scale-set 1)
-;;    (kill-local-variable 'text-scale-mode-amount)
-;;    (setq-default text-scale-mode-amount (+ text-scale-mode-amount inc))
-;;    (global-text-scale-mode 1)
-;;    )
-;;  (global-set-key (kbd "C-+")
-;;                  '(lambda () (interactive) (global-text-scale-adjust 1)))
-;;  (global-set-key (kbd "C--")
-;;                  '(lambda () (interactive) (global-text-scale-adjust -1)))
+  (defun global-text-scale-adjust (inc) (interactive)
+    (text-scale-set 1)
+    (kill-local-variable 'text-scale-mode-amount)
+    (setq-default text-scale-mode-amount (+ text-scale-mode-amount inc))
+    (global-text-scale-mode 1)
+    )
+  (global-set-key (kbd "C-+")
+                  '(lambda () (interactive) (global-text-scale-adjust 1)))
+(global-set-key (kbd "C--")
+					;
+		'(lambda () (interactive) (global-text-scale-adjust -1)))
 
 ;; org mode
 (setq org-agenda-files (quote ("~/work.org")))
@@ -579,8 +581,10 @@
   (json-mode . lsp)
   (web-mode . lsp)
   (sh-mode . lsp)
+  (elixir-mode . lsp)
   (go-mode . lsp)
-  (dockerfile-mode . lsp))
+  (dockerfile-mode . lsp)
+  (lsp-mode . lsp-lens-mode))
  
 
 (use-package lsp-ui
@@ -661,10 +665,16 @@
 (require 'dap-ruby)
 ;; call dap-ruby-setup
 
-;; dap-python
+;; python
+
+
+;;(use-package lsp-jedi
+;;  :ensure t
+;;  :config
+;;  (with-eval-after-load "lsp-mode"
+;;    (add-to-list 'lsp-disabled-clients 'pyls)
+;;    (add-to-list 'lsp-enabled-clients 'jedi)))
 (require 'dap-python)
-
-
 
 
 
@@ -752,7 +762,7 @@
      ("G" projectile-rails-goto-gemfile "Go to Gemfile" :toggle nil)
      ("R" rake "Rake Task" :toggle nil))
     "RSpec"
-    (("j" projectile-rails-find-current-spec "Go to Spec" :toggle nil)
+    (("j" projectile-rails-find-current-test "Go to Spec" :toggle nil)
      ("t" ruby-test-run-at-point "Run at point" :toggle nil)
      ("T" ruby-test-run "Run all" :toggle nil))))
    :bind ("C-r" . enh-ruby-mode-hydra/body)
@@ -818,10 +828,20 @@
   ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
   (setq sbt:program-options '("-Dsbt.supershell=false"))
   )
+;; Add metals backend for lsp-mode
+(use-package lsp-metals
+  :config (setq lsp-metals-treeview-show-when-views-received t))
 
 
 ;;;;;;;;;;;;;;;;;
-;;; node.js;;;;;;
+;;; elixir (use-package elixir-mode :ensure t);;;;;;
+;;;;;;;;;;;;;;;;;
+(use-package elixir-mode :ensure t)
+(use-package alchemist :ensure t)
+
+
+;;;;;;;;;;;;;;;;;
+;;; elixir ;;;;;;
 ;;;;;;;;;;;;;;;;;
 
 (use-package js3-mode :ensure t)
@@ -886,7 +906,12 @@
 ;;;;;;;;;;;;;;;;;
 
 (use-package go-mode :ensure t)
-
+;; Set up before-save hooks to format buffer and add/delete imports.
+;; Make sure you don't have other gofmt/goimports hooks enabled.
+(defun lsp-go-install-save-hooks ()
+  (add-hook 'before-save-hook #'lsp-format-buffer t t)
+  (add-hook 'before-save-hook #'lsp-organize-imports t t))
+(add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
 
 
 ;;;;;;;;;;;;;;;;;
@@ -937,4 +962,5 @@
 ;; },
 ;; "ecmaVersion": 6
 ;; }
+
 
