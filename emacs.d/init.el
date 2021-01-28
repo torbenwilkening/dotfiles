@@ -18,11 +18,16 @@
 (use-package exec-path-from-shell :ensure t)
 (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize))
+;; copy path
+(exec-path-from-shell-copy-env "PATH")
+
 
 ;;;;;;;;;;;;;;;;;
 ;; defaults ;;;;;
 ;;;;;;;;;;;;;;;;;
 (add-to-list 'default-frame-alist '(ns-appearance . dark))
+
+(setq package-check-signature nil)
 
 ;; backups/saves
 (setq make-backup-files nil)
@@ -77,23 +82,6 @@
 (global-set-key (kbd "C-d") 'dap-hydra)
 
 
-;; scaling of text
-(define-globalized-minor-mode
-    global-text-scale-mode
-    text-scale-mode
-    (lambda () (text-scale-mode 1)))
-  
-  (defun global-text-scale-adjust (inc) (interactive)
-    (text-scale-set 1)
-    (kill-local-variable 'text-scale-mode-amount)
-    (setq-default text-scale-mode-amount (+ text-scale-mode-amount inc))
-    (global-text-scale-mode 1)
-    )
-  (global-set-key (kbd "C-+")
-                  '(lambda () (interactive) (global-text-scale-adjust 1)))
-(global-set-key (kbd "C--")
-					;
-		'(lambda () (interactive) (global-text-scale-adjust -1)))
 
 ;; org mode
 (setq org-agenda-files (quote ("~/work.org")))
@@ -103,12 +91,6 @@
 (global-set-key (kbd "C->") 'mc/mark-next-like-this)
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-
-
-;; shell
-;;Use M-x customize-variable RET shell-pop-shell-type RET to customize the shell to use. Four pre-set options are: shell, terminal, ansi-term, and eshell. You can also set your custom shell if you use other configuration
-(use-package shell-pop :ensure t)
-
 
 
 
@@ -122,11 +104,11 @@
   :defer t
   :init (global-company-mode t)
   :config
-  (setq company-tooltip-limit 10
+  (setq company-tooltip-limit 5
 	company-idle-delay .1
 	company-echo-delay 0
 	completion-ignore-case nil
-	company-minimum-prefix-length 2 ; only after first character
+	company-minimum-prefix-length 1 ; only after first character
 	company-begin-commands '(self-insert-command))) ; only after typing
 (setq-local company-dabbrev-downcase nil)  ;; removed downcase annoyance
 
@@ -175,9 +157,7 @@
 ;; default size
 (when window-system
 ;;  (set-frame-position (selected-frame) 0 0)
-  (set-frame-size (selected-frame) 150 50))
-;; copy path
-(exec-path-from-shell-copy-env "PATH")
+  (set-frame-size (selected-frame) 150 60))
 ;; tramp settings
 (use-package tramp
   :ensure t
@@ -202,6 +182,8 @@
   (setq mac-option-key-is-meta t)
   (setq mac-option-modifier 'meta)
   (setq mac-right-option-modifier nil))
+;; a little bit window transparency
+(set-frame-parameter (selected-frame) 'alpha '(99 99))
 
 ;; disable guru mode by default
 ;; M-x customize-option prelude-guru -> disable it
@@ -423,7 +405,7 @@
   ;; global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
         doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-solarized-dark t) ; change theme here (looks good: doom-material doom-one doom-dark+ doom-solarized-dark)
+  (load-theme 'doom-one t) ; change theme here (looks good: doom-material doom-one doom-dark+ doom-solarized-dark)
   ;; enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
   ;; or for treemacs users
@@ -538,10 +520,10 @@
 
 
 ;; text scaling
-(defhydra hydra-zoom (global-map "C-+")
-  "zoom"
-  ("+" text-scale-increase "in")
-  ("-" text-scale-decrease "out"))
+;;(defhydra hydra-zoom (global-map "C-+")
+;;  "zoom"
+;;  ("+" text-scale-increase "in")
+;;  ("-" text-scale-decrease "out"))
 
 
 
@@ -561,7 +543,6 @@
 ;; for json: npm i -g vscode-json-languageserver
 ;; for yaml: npm install -g yaml-language-server
 
-
 (use-package lsp-mode
   :ensure t
   :init (setq lsp-inhibit-message t
@@ -573,6 +554,7 @@
   (less-css-mode . lsp)
   (scss-mode . lsp)
   (enh-ruby-mode . lsp)
+  (ruby-mode . lsp)
   (scala-mode . lsp)
   (java-mode . lsp)
   (python-mode . lsp)
@@ -584,8 +566,17 @@
   (elixir-mode . lsp)
   (go-mode . lsp)
   (dockerfile-mode . lsp)
+  (vue-mode . lsp)
+  (vue-html-mode . lsp)
   (lsp-mode . lsp-lens-mode))
- 
+
+;; install vscode language servers
+;; npm install -g dockerfile-language-server-nodejs
+;; npm install -g yaml-language-server
+;; npm install -g vscode-css-languageserver-bin
+;; npm install -g vscode-html-languageserver-bin
+;; npm install -g dockerfile-language-server-nodejs
+;; npm install -g vue-language-server
 
 (use-package lsp-ui
   :ensure t
@@ -667,15 +658,14 @@
 
 ;; python
 
-
-;;(use-package lsp-jedi
-;;  :ensure t
-;;  :config
-;;  (with-eval-after-load "lsp-mode"
-;;    (add-to-list 'lsp-disabled-clients 'pyls)
-;;    (add-to-list 'lsp-enabled-clients 'jedi)))
+(use-package lsp-jedi
+  :ensure t
+  :config
+  (with-eval-after-load "lsp-mode"
+    (add-to-list 'lsp-disabled-clients 'pyls)
+    (add-to-list 'lsp-enabled-clients 'jedi)))
 (require 'dap-python)
-
+;; call `pip install jedi` 
 
 
 (use-package markdown-mode
@@ -683,7 +673,11 @@
   :mode "\\.md\\'")
 
 
-(add-to-list 'auto-mode-alist '("\\.html\\'" . html-mode))
+(add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+
+(use-package web-mode
+  :ensure t
+  :mode "\\.js\\'")
 
 
 (use-package css-mode
@@ -739,8 +733,25 @@
 ;;;;;;;;;;;;;;;;;
 (use-package pretty-hydra :ensure t)
 
+;; ruby test functions
+  (defun run-rspec-test-file ()
+    (interactive)
+    (let ((filename (ruby-test-find-file))
+	  (default-directory (ruby-test-rails-root (ruby-test-find-file))))
+      (ruby-test-run-command (ruby-test-spec-command filename))))
 
+  (defun run-rspec-test-at-point ()
+    (interactive)
+    (let* ((filename (ruby-test-find-file))
+	   (default-directory (ruby-test-rails-root filename))
+           (buffername (get-file-buffer filename)))
+      (with-current-buffer buffername
+        (let ((line (line-number-at-pos (point))))
+	  (ruby-test-run-command (ruby-test-spec-command filename line))))
+      )
+    )
 
+(setq compilation-window-height 12)
 (global-unset-key (kbd "C-r"))
 
 (use-package enh-ruby-mode
@@ -763,8 +774,8 @@
      ("R" rake "Rake Task" :toggle nil))
     "RSpec"
     (("j" projectile-rails-find-current-test "Go to Spec" :toggle nil)
-     ("t" ruby-test-run-at-point "Run at point" :toggle nil)
-     ("T" ruby-test-run "Run all" :toggle nil))))
+     ("t" run-rspec-test-at-point "Run at point" :toggle nil)
+     ("T" run-rspec-test-file "Run all" :toggle nil))))
    :bind ("C-r" . enh-ruby-mode-hydra/body)
   )
 
@@ -836,7 +847,7 @@
 ;;;;;;;;;;;;;;;;;
 ;;; elixir (use-package elixir-mode :ensure t);;;;;;
 ;;;;;;;;;;;;;;;;;
-(use-package elixir-mode :ensure t)
+(use-package elixir-mode :ensure t :init (add-to-list 'exec-path "~/src/elixir-ls"))
 (use-package alchemist :ensure t)
 
 
@@ -844,24 +855,24 @@
 ;;; elixir ;;;;;;
 ;;;;;;;;;;;;;;;;;
 
-(use-package js3-mode :ensure t)
-(add-to-list 'auto-mode-alist '("\\.js\\'" . js3-mode))
+;;(use-package js3-mode :ensure t)
+;;(add-to-list 'auto-mode-alist '("\\.js\\'" . js3-mode))
 ;;(add-to-list 'company-backends 'company-tern)
 ;;(add-hook 'js3-mode-hook (lambda ()
 ;;                           (tern-mode)
 ;;                           (company-mode)))
 
 
-;;;;;;;;;;;;;;;;;
-;;; typescript ;;
-;;;;;;;;;;;;;;;;;
-
-(use-package tide
-  :ensure t
-  :after (typescript-mode company flycheck)
-  :hook ((typescript-mode . tide-setup)
-         (typescript-mode . tide-hl-identifier-mode)
-         (before-save . tide-format-before-save)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; typescript and javascript ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package vue-mode :ensure t)
+;;(use-package tide
+;;  :ensure t
+;;  :after (typescript-mode company flycheck)
+;;  :hook ((typescript-mode . tide-setup)
+;;         (typescript-mode . tide-hl-identifier-mode)
+;;         (before-save . tide-format-before-save)))
 
 ;;;;;;;;;;;;;;;;;
 ;;; web ;;;;;;;;;
@@ -913,6 +924,10 @@
   (add-hook 'before-save-hook #'lsp-organize-imports t t))
 (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
 
+(lsp-register-custom-settings
+ '(("gopls.completeUnimported" t t)
+   ("gopls.staticcheck" t t)))
+
 
 ;;;;;;;;;;;;;;;;;
 ;;; sql ;;;;;;;;;
@@ -962,5 +977,16 @@
 ;; },
 ;; "ecmaVersion": 6
 ;; }
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize))
 
+;; fix for some reasons
+(setq lsp-enabled-clients nil)
+
+
+(exec-path-from-shell-copy-env "RUBYOPT")
+(exec-path-from-shell-copy-env "RAILS_ENV")
+
+(exec-path-from-shell-copy-env "GO_PATH")
+(exec-path-from-shell-copy-env "GO_ROOT")
 
