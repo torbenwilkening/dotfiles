@@ -52,15 +52,21 @@
 ;; some special shortcuts
 
 ;; use CTRL+SHIFT+<arrow> for window movement
-(define-key global-map (kbd "C-<up>") 'windmove-up)
-(define-key global-map (kbd "C-<down>") 'windmove-down)
-(define-key global-map (kbd "C-<left>") 'windmove-left)
-(define-key global-map (kbd "C-<right>") 'windmove-right)
+(define-key global-map (kbd "s-<up>") 'windmove-up)
+(define-key global-map (kbd "s-<down>") 'windmove-down)
+(define-key global-map (kbd "s-<left>") 'windmove-left)
+(define-key global-map (kbd "s-<right>") 'windmove-right)
 
 ;; ibuffer with focus
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key (kbd "C-b") 'ibuffer)
 (global-set-key (kbd "M-b") 'switch-to-buffer)
+
+;; better cursor movement
+(global-set-key (kbd "M-<down>")
+                (lambda () (interactive) (forward-line  5)))
+(global-set-key (kbd "M-<up>")
+                (lambda () (interactive) (forward-line -5)))
 
 ;; recent files selection
 (global-set-key (kbd "C-c f") 'recentf-open-more-files)
@@ -82,9 +88,43 @@
 (global-set-key (kbd "C-d") 'dap-hydra)
 
 
+;; undo key CTRL+u
+(global-set-key (kbd "C-u") 'undo)
 
 ;; org mode
-(setq org-agenda-files (quote ("~/work.org")))
+(setq org-agenda-files (quote ("~/Projects/org/calendar.org")))
+
+
+;;; synchronize exchange to org agenda
+;;ORGANISED_EXCHANGE_ORIGIN=~/Projects/org/calendar.ics
+;;ORGANISED_EXCHANGE_DESTINATION=~/Projects/org/calendar.org
+
+; https://github.com/ettomatic/organised-exchange
+(defun organised-exchange ()
+  "Sync Outlook Calendar ics with Org Agenda."
+  (interactive)
+  (if (get-buffer "calendar.org")
+      (kill-buffer "calendar.org"))
+  (shell-command "~/Projects/scripts/organised-exchange/bin/eto")
+  (message "Calendar imported!"))
+
+
+(pretty-hydra-define my-dashboard-hydra
+  (:quit-key "q" :color teal :title "")
+  (
+    "Org Mode"
+    (("o" (lambda () (interactive) (switch-to-buffer "*dashboard*")) "Go to Dashboard" :toggle nil)
+     ("s" organised-exchange "Synchronize Calendar" :toggle nil))
+    ;"RSpec"
+    ;(("j" projectile-rails-find-current-test "Go to Spec" :toggle nil)
+    ; ("t" run-rspec-test-at-point "Run at point" :toggle nil)
+    ; ("T" run-rspec-test-file "Run all" :toggle nil))
+    )
+  )
+;; dashboard keys
+;;(global-set-key (kbd "C-o") (lambda () (interactive) (switch-to-buffer "*dashboard*")
+(global-set-key (kbd "C-o") (lambda () (interactive) (my-dashboard-hydra/body)))
+
 
 ;; multi cursor
 (use-package multiple-cursors :ensure t)
@@ -93,6 +133,7 @@
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 
 
+;; other packages
 
 ;;;;;;;;;;;;;;;;;;;;;
 ;; company ;;;;;;;;;;
@@ -119,26 +160,20 @@
 ;; go to ~/.emacs.d/elpa/26.1/develop/company-box-xxx/images
 ;; and run mogrify -resize 50% *.png if images are too big
 
-;; syntax highlighting
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; flycheck syntax checks here
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (use-package flycheck
   :ensure t
   :config
-  (add-hook 'after-init-hook #'global-flycheck-mode))
+  (flycheck-add-mode 'javascript-eslint 'web-mode)
+  (global-flycheck-mode t))
 (use-package flycheck-color-mode-line
   :ensure t
   :config
   (add-hook 'flycheck-mode-hook 'flycheck-color-mode-line-mode))
-
-;;(use-package flycheck-pos-tip
-;;  :ensure t
-;;  :config
-;;  (eval-after-load 'flycheck
-;;    '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
-
-;;(use-package flymake-diagnostic-at-point
-;;  :after flymake
-;;  :config
-;;  (add-hook 'flymake-mode-hook #'flymake-diagnostic-at-point-mode))
 
 
 ;; default scrollbar
@@ -312,7 +347,6 @@
           treemacs-deferred-git-apply-delay      0.5
           treemacs-directory-name-transformer    #'identity
           treemacs-display-in-side-window        t
-          treemacs-eldoc-display                 t
           treemacs-file-event-delay              5000
           treemacs-file-extension-regex          treemacs-last-period-regex-value
           treemacs-file-follow-delay             0.2
@@ -481,7 +515,7 @@
 (use-package dashboard
   :config
   (setq dashboard-banner-logo-title "Welcome my master")
-  (setq dashboard-items '((projects . 5)
+  (setq dashboard-items '((projects . 10)
                           (bookmarks . 5)
                           (recents  . 5)))
   (dashboard-setup-startup-hook))
@@ -495,6 +529,7 @@
 ;; 1, 2 or 3 which displays one of the text banners
 ;; "path/to/your/image.png" which displays whatever image you would prefer
 (setq dashboard-center-content t)
+
 
 ;(use-package hydra
 ;  :ensure t
@@ -562,6 +597,7 @@
   (yaml-mode . lsp)
   (json-mode . lsp)
   (web-mode . lsp)
+  (js-mode . lsp)
   (sh-mode . lsp)
   (elixir-mode . lsp)
   (go-mode . lsp)
@@ -582,7 +618,7 @@
   :ensure t
   :config
   (setq lsp-ui-sideline-enable t
-        lsp-ui-doc-enable t
+        lsp-ui-doc-enable nil
 	
 	;; some sideline tweaks if you want to enable it
 	;; shows only lint and errors in the sideline
@@ -628,9 +664,9 @@
 ;;(add-hook 'lsp-mode-hook 'lsp-ui-mode)
 
 ;; flycheck lsp
-;;(require 'lsp-ui-flycheck)
-;;(with-eval-after-load 'lsp-mode
-;;  (add-hook 'lsp-after-open-hook (lambda () (lsp-flycheck-enable t))))
+;; (require 'lsp-ui-flycheck)
+;(with-eval-after-load 'lsp-mode
+;  (add-hook 'lsp-after-open-hook (lambda () (lsp-flycheck-enable t))))
 
 ;;(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 
@@ -671,13 +707,6 @@
 (use-package markdown-mode
   :ensure t
   :mode "\\.md\\'")
-
-
-(add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
-
-(use-package web-mode
-  :ensure t
-  :mode "\\.js\\'")
 
 
 (use-package css-mode
@@ -786,6 +815,16 @@
 (use-package rbenv :ensure t)
 (use-package rake :ensure t)
 
+;; some flycheck fix, make sure in /usr/local/bin/rubocop is this script:
+;#!/bin/bash
+;bundle exec rubocop "$@"
+
+(setq flycheck-ruby-rubocop-executable "/usr/local/bin/rubocop")
+
+(use-package haml-mode
+  :ensure t
+  :mode "\\.haml\\'")
+
 
 (sp-with-modes '(rhtml-mode)
   (sp-local-pair "<" ">")
@@ -814,6 +853,9 @@
 (add-hook 'enh-ruby-mode-hook 'ruby-test-mode)
 (add-hook 'enh-ruby-mode-hook #'rubocop-mode)
 (add-hook 'after-init-hook 'inf-ruby-switch-setup) ;; enable byebug and pry
+
+(add-hook 'enh-ruby-mode-hook #'lsp-ui-sideline-mode)
+
 ;; ruby settings
 (setq ruby-insert-encoding-magic-comment nil)
 ;; remove default faces for enh-ruby-mode
@@ -851,22 +893,42 @@
 (use-package alchemist :ensure t)
 
 
-;;;;;;;;;;;;;;;;;
-;;; elixir ;;;;;;
-;;;;;;;;;;;;;;;;;
-
-;;(use-package js3-mode :ensure t)
-;;(add-to-list 'auto-mode-alist '("\\.js\\'" . js3-mode))
-;;(add-to-list 'company-backends 'company-tern)
-;;(add-hook 'js3-mode-hook (lambda ()
-;;                           (tern-mode)
-;;                           (company-mode)))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; typescript and javascript ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package vue-mode :ensure t)
+(use-package nvm :ensure t)
+
+(use-package vue-mode
+  :ensure t
+  :custom
+  (web-mode-markup-indent-offset 2)
+  (web-mode-css-indent-offset 2)
+  (web-mode-code-indent-offset 2)
+  (css-indent-offset 2)
+  (indent-tabs-mode nil)
+  (js-indent-level 2)
+  :config
+  (add-hook 'vue-mode-hook #'lsp-ui-sideline-mode))
+
+
+;; add javascript-eslint checker in addition to lsp
+;;(add-hook 'js-mode-hook
+;;          (lambda ()
+;;            (require lsp-mode)
+;;                   (lsp-deferred)
+;;                   (flycheck-add-next-checker 'lsp 'javascript-eslint)))
+
+
+
+
+
+
+
+
+;; npm install -g vscode-css-languageservice eslint prettier vue-language-server vscode-html-languageserver-bin  vscode-css-languageserver-bin flow-bin
+;; you might run into this https://github.com/neoclide/coc-vetur/issues/28
+
 ;;(use-package tide
 ;;  :ensure t
 ;;  :after (typescript-mode company flycheck)
@@ -878,26 +940,10 @@
 ;;; web ;;;;;;;;;
 ;;;;;;;;;;;;;;;;;
 
-(use-package web-mode :ensure t)
-;;(defun my-web-mode-hook ()
-;; "Hook for `web-mode'."
-;;  (set (make-local-variable 'company-backends)
-;;       '(company-tern company-web-html company-yasnippet company-files)))
-;;(add-hook 'web-mode-hook 'my-web-mode-hook)
-;;(add-hook 'web-mode-hook (lambda ()
-;;                          (set (make-local-variable 'company-backends) '(company-web-html))
-;;                          (company-mode t)))
+(use-package web-mode
+  :ensure t)
+(add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
 
-;; enable javascript completion between <script>...</script> etc.
-;;(advice-add 'company-tern :before
-;;            #'(lambda (&rest _)
-;;                (if (equal major-mode 'web-mode)
-;;                    (let ((web-mode-cur-language
-;;                           (web-mode-language-at-pos)))
-;;                      (if (or (string= web-mode-cur-language "javascript")
-;;                              (string= web-mode-cur-language "jsx"))
-;;                          (unless tern-mode (tern-mode))
-;;                        (if tern-mode (tern-mode -1)))))))
 
 ;;;;;;;;;;;;;;;;;
 ;;; mermaid js ;;
@@ -938,50 +984,13 @@
           (lambda ()
             (toggle-truncate-lines t)))
 
-;; some .tern-project file example for ~/.tern-project
-;;{
-;; "libs": [
-;;          "browser",
-;;          "jquery",
-;;          "react",
-;;          "chai",
-;;          "ecma5",
-;;          "ecma6"
-;;          ],
-;; "defs": [
-;;          "browser",
-;;          "ecma5",
-;;          "ecma6"
-;;          ],
-;; "plugins": {
-;; "doc_comment": {
-;; },
-;; "angular": {
-;; },
-;; "node": {
-;; },
-;; "commonjs": {
-;; },
-;; "complete_strings": {
-;; },
-;; "es_modules": {
-;; },
-;; "modules": {
-;; },
-;; "node_resolve": {
-;; },
-;; "requirejs": {
-;; },
-;; "webpack": {
-;; }
-;; },
-;; "ecmaVersion": 6
-;; }
 (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize))
 
 ;; fix for some reasons
 (setq lsp-enabled-clients nil)
+
+
 
 
 (exec-path-from-shell-copy-env "RUBYOPT")
