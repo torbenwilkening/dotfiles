@@ -68,6 +68,9 @@
 (global-set-key (kbd "M-<up>")
                 (lambda () (interactive) (forward-line -5)))
 
+;; selection
+(global-set-key (kbd "C-a") 'mark-whole-buffer)
+
 ;; recent files selection
 (global-set-key (kbd "C-c f") 'recentf-open-more-files)
 (global-set-key (kbd "C-S-s") 'ag-project)
@@ -96,10 +99,9 @@
 
 
 ;;; synchronize exchange to org agenda
-;;ORGANISED_EXCHANGE_ORIGIN=~/Projects/org/calendar.ics
+;;ORGANISED_EXCHANGE_ORIGIN=~/Projects/calendar.ics
 ;;ORGANISED_EXCHANGE_DESTINATION=~/Projects/org/calendar.org
 
-; https://github.com/ettomatic/organised-exchange
 (defun organised-exchange ()
   "Sync Outlook Calendar ics with Org Agenda."
   (interactive)
@@ -109,21 +111,6 @@
   (message "Calendar imported!"))
 
 
-(pretty-hydra-define my-dashboard-hydra
-  (:quit-key "q" :color teal :title "")
-  (
-    "Org Mode"
-    (("o" (lambda () (interactive) (switch-to-buffer "*dashboard*")) "Go to Dashboard" :toggle nil)
-     ("s" organised-exchange "Synchronize Calendar" :toggle nil))
-    ;"RSpec"
-    ;(("j" projectile-rails-find-current-test "Go to Spec" :toggle nil)
-    ; ("t" run-rspec-test-at-point "Run at point" :toggle nil)
-    ; ("T" run-rspec-test-file "Run all" :toggle nil))
-    )
-  )
-;; dashboard keys
-;;(global-set-key (kbd "C-o") (lambda () (interactive) (switch-to-buffer "*dashboard*")
-(global-set-key (kbd "C-o") (lambda () (interactive) (my-dashboard-hydra/body)))
 
 
 ;; multi cursor
@@ -531,14 +518,7 @@
 (setq dashboard-center-content t)
 
 
-;(use-package hydra
-;  :ensure t
-;  :defer t
-;  :init
-;  (defhydra hydra-zoom (global-map "<f2>")
-;    "zoom"
-;    ("g" text-scale-increase)
-;    ("l" text-scale-decrease)))
+
 
 ;; Show new mails in modeline
 ;; (use-package mu4e-alert :ensure t)
@@ -552,6 +532,32 @@
 ;; (if (eq system-type 'darwin) (mu4e-alert-set-default-style 'notifier))
 ;; (if (eq system-type 'gnu/linux) (mu4e-alert-set-default-style 'libnotify))
 ;; (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
+
+
+(use-package pretty-hydra :ensure t)
+;(use-package hydra
+;  :ensure t
+;  :defer t
+;  :init
+;  (defhydra hydra-zoom (global-map "<f2>")
+;    "zoom"
+;    ("g" text-scale-increase)
+;    ("l" text-scale-decrease)))
+(pretty-hydra-define my-dashboard-hydra
+  (:quit-key "q" :color teal :title "")
+  (
+    "Org Mode"
+    (("o" (lambda () (interactive) (switch-to-buffer "*dashboard*")) "Go to Dashboard" :toggle nil)
+     ("s" organised-exchange "Synchronize Calendar" :toggle nil))
+    ;"RSpec"
+    ;(("j" projectile-rails-find-current-test "Go to Spec" :toggle nil)
+    ; ("t" run-rspec-test-at-point "Run at point" :toggle nil)
+    ; ("T" run-rspec-test-file "Run all" :toggle nil))
+    )
+  )
+;; dashboard keys
+;;(global-set-key (kbd "C-o") (lambda () (interactive) (switch-to-buffer "*dashboard*")
+(global-set-key (kbd "C-o") (lambda () (interactive) (my-dashboard-hydra/body)))
 
 
 ;; text scaling
@@ -760,7 +766,7 @@
 ;;;;;;;;;;;;;;;;;
 ;;; ruby ;;;;;;;;
 ;;;;;;;;;;;;;;;;;
-(use-package pretty-hydra :ensure t)
+
 
 ;; ruby test functions
   (defun run-rspec-test-file ()
@@ -999,3 +1005,22 @@
 (exec-path-from-shell-copy-env "GO_PATH")
 (exec-path-from-shell-copy-env "GO_ROOT")
 
+
+
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(compilation-window-height 12)
+ '(package-selected-packages
+   '(pomodoro js2-mode nvm ace-jump-buffer rspec-mode haml-mode vue-mode lsp-intellij yaml-mode which-key web-mode use-package undo-tree treemacs-projectile treemacs-magit treemacs-icons-dired tide smartparens shell-pop scss-mode scala-mode sbt-mode ruby-test-mode rubocop rbenv projectile-rails pretty-hydra nlinum multiple-cursors mermaid-mode lsp-ui lsp-metals lsp-jedi lsp-ivy json-mode js3-mode groovy-mode graphql-mode go-mode gnu-elpa-keyring-update git-timemachine git-gutter-fringe flycheck-color-mode-line exec-path-from-shell enh-ruby-mode doom-themes doom-modeline dockerfile-mode dashboard counsel-projectile company-box circe bundler alchemist ag))
+ '(pomodoro-desktop-notification t)
+ '(ruby-test-execution-environment '("RUBY_ENV=test")))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(treemacs-root-face ((t (:inherit (variable-pitch font-lock-string-face) :weight bold :height 0.9)))))
