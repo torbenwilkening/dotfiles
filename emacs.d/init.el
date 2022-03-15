@@ -69,7 +69,7 @@
                 (lambda () (interactive) (forward-line -5)))
 
 ;; selection
-(global-set-key (kbd "C-a") 'mark-whole-buffer)
+;;(global-set-key (kbd "C-a") 'mark-whole-buffer)
 
 ;; recent files selection
 (global-set-key (kbd "C-c f") 'recentf-open-more-files)
@@ -93,6 +93,9 @@
 
 ;; undo key CTRL+u
 (global-set-key (kbd "C-u") 'undo)
+
+;; comment and uncomments
+(global-set-key (kbd "C-/") 'comment-or-uncomment-region)
 
 ;; org mode
 (setq org-agenda-files (quote ("~/Projects/org/calendar.org")))
@@ -610,6 +613,8 @@
   (dockerfile-mode . lsp)
   (vue-mode . lsp)
   (vue-html-mode . lsp)
+  (markdown-mode . lsp)
+  (graphql-mode . lsp)
   (lsp-mode . lsp-lens-mode))
 
 ;; install vscode language servers
@@ -800,13 +805,13 @@
   ((:color blue :quit-key "q")
    (
     "Ruby"
-    (("r" rubocop-mode-check-project "Check Rubocop" :toggle nil)
+    (("r" rubocop-mode-check-current-file "Check Rubocop" :toggle nil)
      ("i" inf-ruby "REPL" :toggle nil))
-   "Rails"
-    (("s" projectile-rails-server "Rails Server" :toggle nil)
-     ("c" projectile-rails-console "Rails Console" :toggle nil)
-     ("G" projectile-rails-goto-gemfile "Go to Gemfile" :toggle nil)
-     ("R" rake "Rake Task" :toggle nil))
+;   "Rails"
+;    (("s" projectile-rails-server "Rails Server" :toggle nil)
+;     ("c" projectile-rails-console "Rails Console" :toggle nil)
+;     ("G" projectile-rails-goto-gemfile "Go to Gemfile" :toggle nil)
+;     ("R" rake "Rake Task" :toggle nil))
     "RSpec"
     (("j" projectile-rails-find-current-test "Go to Spec" :toggle nil)
      ("t" run-rspec-test-at-point "Run at point" :toggle nil)
@@ -820,6 +825,8 @@
 (use-package bundler :ensure t)
 (use-package rbenv :ensure t)
 (use-package rake :ensure t)
+
+(setq ruby-test-execution-environment "RAILS_ENV=test")
 
 ;; some flycheck fix, make sure in /usr/local/bin/rubocop is this script:
 ;#!/bin/bash
@@ -915,40 +922,19 @@
   (indent-tabs-mode nil)
   (js-indent-level 2)
   :config
+  (add-hook 'vue-mode-hook #'lsp)
   (add-hook 'vue-mode-hook #'lsp-ui-sideline-mode))
 
-
-;; add javascript-eslint checker in addition to lsp
-;;(add-hook 'js-mode-hook
-;;          (lambda ()
-;;            (require lsp-mode)
-;;                   (lsp-deferred)
-;;                   (flycheck-add-next-checker 'lsp 'javascript-eslint)))
-
-
-
-
-
-
-
-
-;; npm install -g vscode-css-languageservice eslint prettier vue-language-server vscode-html-languageserver-bin  vscode-css-languageserver-bin flow-bin
-;; you might run into this https://github.com/neoclide/coc-vetur/issues/28
-
-;;(use-package tide
-;;  :ensure t
-;;  :after (typescript-mode company flycheck)
-;;  :hook ((typescript-mode . tide-setup)
-;;         (typescript-mode . tide-hl-identifier-mode)
-;;         (before-save . tide-format-before-save)))
-
-;;;;;;;;;;;;;;;;;
-;;; web ;;;;;;;;;
-;;;;;;;;;;;;;;;;;
-
+;; webmode with js / ts / vue minor modes
 (use-package web-mode
   :ensure t)
 (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.vue\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.ts\\'" . web-mode))
+
 
 
 ;;;;;;;;;;;;;;;;;
@@ -984,14 +970,36 @@
 ;;;;;;;;;;;;;;;;;
 ;;; sql ;;;;;;;;;
 ;;;;;;;;;;;;;;;;;
+(use-package sqlup-mode :ensure t)
+(use-package sql-indent :ensure t)
+
+(add-hook 'sql-mode-hook 'lsp)
+(add-hook 'sql-mode-hook 'sqlup-mode)
+;(add-hook 'sql-mode-hook 'sql-indent)
+
+(setq lsp-sqls-workspace-config-path nil)
+(setq lsp-sqls-connections
+    '(((driver . "mysql") (dataSourceName . "root@tcp(127.0.0.1:3306)/ace"))))
+;;(use-package sql-mode
+;;  :ensure t
+;;  :custom
+;;  (sql-capitalize-keywords t)
+;;  (sql-backend 'lsp)
+;;  (lsp-sqls-workspace-config-path nil))
+
 
 ;; some fixes
 (add-hook 'sql-interactive-mode-hook
           (lambda ()
             (toggle-truncate-lines t)))
 
+
+
+;; osx fix
 (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize))
+
+
 
 ;; fix for some reasons
 (setq lsp-enabled-clients nil)
@@ -1005,22 +1013,6 @@
 (exec-path-from-shell-copy-env "GO_PATH")
 (exec-path-from-shell-copy-env "GO_ROOT")
 
+(exec-path-from-shell-copy-env "PATH")
 
 
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(compilation-window-height 12)
- '(package-selected-packages
-   '(pomodoro js2-mode nvm ace-jump-buffer rspec-mode haml-mode vue-mode lsp-intellij yaml-mode which-key web-mode use-package undo-tree treemacs-projectile treemacs-magit treemacs-icons-dired tide smartparens shell-pop scss-mode scala-mode sbt-mode ruby-test-mode rubocop rbenv projectile-rails pretty-hydra nlinum multiple-cursors mermaid-mode lsp-ui lsp-metals lsp-jedi lsp-ivy json-mode js3-mode groovy-mode graphql-mode go-mode gnu-elpa-keyring-update git-timemachine git-gutter-fringe flycheck-color-mode-line exec-path-from-shell enh-ruby-mode doom-themes doom-modeline dockerfile-mode dashboard counsel-projectile company-box circe bundler alchemist ag))
- '(pomodoro-desktop-notification t)
- '(ruby-test-execution-environment '("RUBY_ENV=test")))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(treemacs-root-face ((t (:inherit (variable-pitch font-lock-string-face) :weight bold :height 0.9)))))
