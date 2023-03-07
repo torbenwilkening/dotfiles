@@ -170,7 +170,7 @@
 (scroll-bar-mode -1)
 
 ;; disable company annoyance on enter / tab
-(setq tab-always-indent t)
+;(setq tab-always-indent t)
 
 ;; ansi-term stuff
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
@@ -247,7 +247,10 @@
   (progn
     (global-undo-tree-mode)
     (setq undo-tree-visualizer-timestamps t)
+    (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
     (setq undo-tree-visualizer-diff t)))
+
+(use-package yasnippet :ensure t)
 
 ;;; searching
 (use-package ag
@@ -391,7 +394,7 @@
         ("C-x t C-t" . treemacs-find-file)
         ("C-x t M-t" . treemacs-find-tag)))
 
-
+; all-the-icons
 
 (use-package treemacs-projectile
   :after treemacs projectile
@@ -417,7 +420,7 @@
 ;; alltheicons ;;
 ;;;;;;;;;;;;;;;;;
 (use-package all-the-icons :ensure t)
-;; to use fonts run M-x 
+;; to use fonts run M-x
 ;; all-the-icons-install-fonts RET
 
 ;;;;;;;;;;;;;;;;;
@@ -429,7 +432,7 @@
   ;; global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
         doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-one t) ; change theme here (looks good: doom-material doom-one doom-dark+ doom-solarized-dark)
+  (load-theme 'doom-gruvbox t) ; change theme here (looks good: doom-material doom-one doom-dark+ doom-solarized-dark)
   ;; enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
   ;; or for treemacs users
@@ -546,22 +549,29 @@
 ;    "zoom"
 ;    ("g" text-scale-increase)
 ;    ("l" text-scale-decrease)))
-(pretty-hydra-define my-dashboard-hydra
-  (:quit-key "q" :color teal :title "")
-  (
-    "Org Mode"
-    (("o" (lambda () (interactive) (switch-to-buffer "*dashboard*")) "Go to Dashboard" :toggle nil)
-     ("s" organised-exchange "Synchronize Calendar" :toggle nil))
-    ;"RSpec"
-    ;(("j" projectile-rails-find-current-test "Go to Spec" :toggle nil)
-    ; ("t" run-rspec-test-at-point "Run at point" :toggle nil)
-    ; ("T" run-rspec-test-file "Run all" :toggle nil))
-    )
-  )
+
 ;; dashboard keys
 ;;(global-set-key (kbd "C-o") (lambda () (interactive) (switch-to-buffer "*dashboard*")
-(global-set-key (kbd "C-o") (lambda () (interactive) (my-dashboard-hydra/body)))
+;;(global-set-key (kbd "C-o") (lambda () (interactive) (my-dashboard-hydra/body)))
 
+(pretty-hydra-define my-default-hydra
+  (:color blue :quit-key "q")
+   (
+    "General"
+    (("o" (lambda () (interactive) (switch-to-buffer "*dashboard*")) "Go to Dashboard" :toggle nil)
+     ("s" (lambda () (interactive) (switch-to-buffer "*scratch*")) "Go to Scratch Buffer" :toggle nil)
+     ("7" comment-or-uncomment-region "(Un)comment Region" :toggle nil)
+     ("f", indent-region "Indent Region" :toggle nil)
+     ("h" git-timemachine :toggle nil))
+    "Ruby"
+    (("r" rubocop-mode-check-current-file "Check Rubocop" :toggle nil)
+     ("i" inf-ruby "REPL" :toggle nil)
+     ("j" projectile-rails-find-current-test "Go to Spec" :toggle nil)
+     ("t" run-rspec-test-at-point "Run at point" :toggle nil)
+     ("T" run-rspec-test-file "Run all" :toggle nil))
+    )
+   )
+(global-set-key (kbd "C-r") (lambda () (interactive) (my-default-hydra/body)))
 
 ;; text scaling
 ;;(defhydra hydra-zoom (global-map "C-+")
@@ -577,7 +587,7 @@
 
 ;; check supported languages: https://github.com/emacs-lsp/lsp-mode
 ;; for ruby: gem install solargraph
-;; for python: pip3 install python-language-server 
+;; for python: pip3 install python-language-server
 ;; for vue.js: npm install -g vue-language-server
 ;; for typescript: npm i -g javascript-typescript-langserver
 ;; for go: go get golang.org/x/tools/gopls@latest
@@ -614,7 +624,7 @@
   (vue-mode . lsp)
   (vue-html-mode . lsp)
   (markdown-mode . lsp)
-  (graphql-mode . lsp)
+  ;;(graphql-mode . lsp)
   (lsp-mode . lsp-lens-mode))
 
 ;; install vscode language servers
@@ -624,6 +634,11 @@
 ;; npm install -g vscode-html-languageserver-bin
 ;; npm install -g dockerfile-language-server-nodejs
 ;; npm install -g vue-language-server
+
+;; this is used for "error running timer lsp--on-idle" why?
+(setq lsp-enable-links nil)
+
+
 
 (use-package lsp-ui
   :ensure t
@@ -665,7 +680,7 @@
 
 
 
-;; keys for find references and definitions to 
+;; keys for find references and definitions to
 (define-key lsp-ui-mode-map (kbd "C-RET") #'lsp-ui-peek-find-definitions)
 (define-key lsp-ui-mode-map (kbd "<C-return>") #'lsp-ui-peek-find-definitions)
 (define-key lsp-ui-mode-map (kbd "M-RET") #'lsp-ui-peek-find-references)
@@ -712,7 +727,7 @@
     (add-to-list 'lsp-disabled-clients 'pyls)
     (add-to-list 'lsp-enabled-clients 'jedi)))
 (require 'dap-python)
-;; call `pip install jedi` 
+;; call `pip install jedi`
 
 
 (use-package markdown-mode
@@ -801,22 +816,6 @@
 ;;	 ("C-r t" . ruby-test-run-at-point)
 ;;	 ("C-r r" . rake)
   ;;	 ("C-r s" . projectile-rails-find-current-spec))
-  :pretty-hydra
-  ((:color blue :quit-key "q")
-   (
-    "Ruby"
-    (("r" rubocop-mode-check-current-file "Check Rubocop" :toggle nil)
-     ("i" inf-ruby "REPL" :toggle nil))
-;   "Rails"
-;    (("s" projectile-rails-server "Rails Server" :toggle nil)
-;     ("c" projectile-rails-console "Rails Console" :toggle nil)
-;     ("G" projectile-rails-goto-gemfile "Go to Gemfile" :toggle nil)
-;     ("R" rake "Rake Task" :toggle nil))
-    "RSpec"
-    (("j" projectile-rails-find-current-test "Go to Spec" :toggle nil)
-     ("t" run-rspec-test-at-point "Run at point" :toggle nil)
-     ("T" run-rspec-test-file "Run all" :toggle nil))))
-   :bind ("C-r" . enh-ruby-mode-hydra/body)
   )
 
 (use-package smartparens-ruby :ensure smartparens)
@@ -907,10 +906,26 @@
 
 
 
+
+(defvar just-tab-keymap (make-sparse-keymap) "Keymap for just-tab-mode")
+(define-minor-mode just-tab-mode
+  "Just want the TAB key to be a TAB"
+  :global t :lighter " TAB" :init-value 0 :keymap just-tab-keymap
+  (define-key just-tab-keymap (kbd "TAB") 'self-insert-command))
+
+
+
+
+(setq-default indent-tabs-mode nil)
+
+
+
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; typescript and javascript ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package nvm :ensure t)
+;;(use-package nvm :ensure t)
 
 (use-package vue-mode
   :ensure t
@@ -922,12 +937,26 @@
   (indent-tabs-mode nil)
   (js-indent-level 2)
   :config
+  ;; https://github.com/dgutov/mmm-mode/issues/99
+  (add-to-list 'mmm-save-local-variables '(syntax-ppss-table buffer))
+
   (add-hook 'vue-mode-hook #'lsp)
   (add-hook 'vue-mode-hook #'lsp-ui-sideline-mode))
 
 ;; webmode with js / ts / vue minor modes
 (use-package web-mode
+  :custom
+  (electric-indent-mode nil)
+  (lsp-enable-indentation nil)
+  (web-mode-enable-auto-indentation nil)
+  (lsp-enable-on-type-formatting nil)
+;;  :config
+  ;; https://github.com/dgutov/mmm-mode/issues/99
+;;  (add-to-list 'mmm-save-local-variables '(syntax-ppss-table buffer))
+
+
   :ensure t)
+
 (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.vue\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
@@ -935,7 +964,8 @@
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.ts\\'" . web-mode))
 
-
+;; vue mode fix
+;;(add-to-list 'mmm-save-local-variables '(c-current-comment-prefix region))
 
 ;;;;;;;;;;;;;;;;;
 ;;; mermaid js ;;
@@ -977,9 +1007,9 @@
 (add-hook 'sql-mode-hook 'sqlup-mode)
 ;(add-hook 'sql-mode-hook 'sql-indent)
 
-(setq lsp-sqls-workspace-config-path nil)
-(setq lsp-sqls-connections
-    '(((driver . "mysql") (dataSourceName . "root@tcp(127.0.0.1:3306)/ace"))))
+;;(setq lsp-sqls-workspace-config-path nil)
+;;(setq lsp-sqls-connections
+;;    '(((driver . "mysql") (dataSourceName . "root@tcp(127.0.0.1:3306)/dbname"))))
 ;;(use-package sql-mode
 ;;  :ensure t
 ;;  :custom
@@ -1004,7 +1034,7 @@
 ;; fix for some reasons
 (setq lsp-enabled-clients nil)
 
-
+(setq c-basic-offset 2)
 
 
 (exec-path-from-shell-copy-env "RUBYOPT")
@@ -1014,5 +1044,4 @@
 (exec-path-from-shell-copy-env "GO_ROOT")
 
 (exec-path-from-shell-copy-env "PATH")
-
 
