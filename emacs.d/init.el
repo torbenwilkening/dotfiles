@@ -252,6 +252,10 @@
 
 (use-package yasnippet :ensure t)
 
+;; yasnippet
+(use-package yasnippet :ensure t)
+(yas-global-mode 1)
+
 ;;; searching
 (use-package ag
   :commands (ag ag-files ag-regexp ag-project ag-dired helm-ag)
