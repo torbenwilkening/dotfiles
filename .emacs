@@ -14,45 +14,21 @@
 (setq package-enable-at-startup nil)
 (straight-use-package 'use-package)
 
+
 ;;;;;;;;;;;;;
 ;; welcome ;;
 ;;;;;;;;;;;;;
 
-(defun ar/show-welcome-buffer ()
-  "Show *Welcome* buffer."
-  (with-current-buffer (get-buffer-create "*Welcome*")
-    (setq truncate-lines t)
-    (let* ((buffer-read-only)
-           (image-path "~/.logo.png")
-           (image (create-image image-path))
-           (size (image-size image))
-           (height (cdr size))
-           (width (car size))
-           (top-margin (floor (/ (- (window-height) height) 2)))
-           (left-margin (floor (/ (- (window-width) width) 2)))
-           (prompt-title "Welcome to Emacs!"))
-      (erase-buffer)
-      (setq mode-line-format nil)
-      (goto-char (point-min))
-      (insert (make-string top-margin ?\n ))
-      (insert (make-string left-margin ?\ ))
-      (insert-image image)
-      (insert "\n\n\n")
-      (insert (make-string (floor (/ (- (window-width) (string-width prompt-title)) 2)) ?\ ))
-      (insert prompt-title))
-    (setq cursor-type nil)
-    (read-only-mode +1)
-    (switch-to-buffer (current-buffer))
-    (local-set-key (kbd "q") 'kill-this-buffer)))
 
-(setq initial-scratch-message nil)
-(setq inhibit-startup-screen t)
-
-(when (< (length command-line-args) 2)
-  (add-hook 'emacs-startup-hook (lambda ()
-                                  (when (display-graphic-p)
-                                    (ar/show-welcome-buffer)))))
-
+(setq-default inhibit-startup-screen t)
+(setq inhibit-splash-screen t)
+(setq inhibit-startup-message t)
+(setq initial-scratch-message "")
+(setq initial-major-mode 'markdown-mode)
+(add-hook 'after-init-hook 'my-startup-scratch-hook)
+(defun my-startup-scratch-hook ()
+  (with-current-buffer "*scratch*"
+    (hide-mode-line-mode)))
 
 
 ;;;;;;;;;;;;;
@@ -103,29 +79,37 @@
 ;; a little bit window transparency is an option
 ;; (set-frame-parameter (selected-frame) 'alpha '(99 99))
 
+;; hide modeline in certain major modes
 (straight-use-package 'hide-mode-line)
 (add-hook 'eshell-mode-hook 'hide-mode-line-mode)
 
+;; all the icons
 (straight-use-package 'all-the-icons)
+(straight-use-package 'all-the-icons-dired)
 (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
+(setq all-the-icons-dired-monochrome t)
 
+;; general theme
 (straight-use-package 'doom-themes)
+;;(load-theme 'doom-gruvbox t)
+;;(load-theme 'doom-monokai-pro t)
+(load-theme 'doom-nord t)
+(doom-themes-treemacs-config)
 
 ;; treemacs and config
 (straight-use-package 'treemacs)
 (global-set-key (kbd "s-t") 'treemacs)
 (progn
-  (setq treemacs-space-between-root-nodes nil)
+  (setq treemacs-space-between-root-nodes nil
+	treemacs-icons-dired-mode t)
   (treemacs-resize-icons 16))
 (straight-use-package 'treemacs-projectile)
 (straight-use-package 'treemacs-magit)
-;;(straight-use-package 'treemacs-all-the-icons)
 (straight-use-package 'treemacs-icons-dired)
+(treemacs-icons-dired-mode)
 
+;; modeline
 (straight-use-package 'doom-modeline)
-;;(load-theme 'doom-gruvbox t)
-;;(load-theme 'doom-monokai-pro t)
-(load-theme 'doom-nord t)
 (setq doom-themes-treemacs-theme "doom-colors"
       doom-modeline-vcs-max-length 20
       doom-modeline-icon (display-graphic-p)
@@ -176,9 +160,6 @@
 (setq projectile-project-search-path '("~/Projects/"))
 (setq projectile-auto-discover nil)
 
-;; @todo find file explorer for projectile
-(straight-use-package 'project-explorer)
-
 (straight-use-package 'ivy)
 (ivy-mode 1)
 
@@ -188,7 +169,6 @@
 
 (straight-use-package 'swiper)
 
-;; ag
 (straight-use-package 'ag)
 (setq ag-highlight-search t
       ag-reuse-buffers t)
@@ -218,8 +198,8 @@
 (straight-use-package 'multiple-cursors)
 ; @todo keybindings
 
-;; line numbers
-(display-line-numbers-mode)
+;; if you want line numbers
+;; (display-line-numbers-mode)
 
 ;; git changes in line numbers
 (straight-use-package 'git-gutter-fringe)
@@ -433,7 +413,7 @@
 (global-set-key (kbd "s-k") 'kill-current-buffer)
 (global-set-key (kbd "s-f") 'projectile-find-file)
 (global-set-key (kbd "s-s") 'projectile-switch-project)
-(global-set-key (kbd "s-e") 'project-explorer-open)
+(global-set-key (kbd "s-e") 'treemacs)
 ;; replaces i-search with swiper
 (global-set-key (kbd "C-s") 'swiper)
 (global-set-key (kbd "C-S-s") 'ag-project)
@@ -475,3 +455,5 @@
 (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
 (global-set-key (kbd "<f1> o") 'counsel-describe-symbol)
 (global-set-key (kbd "<f1> l") 'counsel-find-library)
+
+;;; .emacs ends here
