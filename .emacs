@@ -36,6 +36,11 @@
 ;;;;;;;;;;;;;
 
 
+;; default window size
+(when window-system
+;;  (set-frame-position (selected-frame) 0 0)
+  (set-frame-size (selected-frame) 120 45))
+
 ;; backup and autosave
 (setq make-backup-files nil)
 (setq auto-save-file-name-transforms
