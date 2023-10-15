@@ -24,7 +24,7 @@
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-message t)
 (setq initial-scratch-message "")
-(setq initial-major-mode 'markdown-mode)
+;;(setq initial-major-mode 'markdown-mode)
 (add-hook 'after-init-hook 'my-startup-scratch-hook)
 (defun my-startup-scratch-hook ()
   (with-current-buffer "*scratch*"
@@ -63,20 +63,26 @@
 ;; some fixes
 (add-to-list 'image-types 'svg)
 
-;; env variables
-(straight-use-package 'exec-path-from-shell)
-(when (memq window-system '(mac ns x))
-  (exec-path-from-shell-initialize))
-(exec-path-from-shell-copy-env "PATH")
+;; env variables (before emacs 29)
+;;(straight-use-package 'exec-path-from-shell)
+;;(when (memq window-system '(mac ns x))
+;;  (exec-path-from-shell-initialize))
+;;(exec-path-from-shell-copy-env "PATH")
 
+;; spaces instead of tabs by default
+(setq-default indent-tabs-mode nil)
+
+;; vterm (install libvterm on your machine)
+(straight-use-package 'vterm)
 
 ;;;;;;;;;;;;;
 ;; theming ;;
 ;;;;;;;;;;;;;
 
-
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
+(if (display-graphic-p)
+    (progn
+      (tool-bar-mode -1)
+      (scroll-bar-mode -1)))
 (display-battery-mode 1)
 (add-to-list 'default-frame-alist '(ns-appearance . dark))
 (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
@@ -89,33 +95,71 @@
 (add-hook 'eshell-mode-hook 'hide-mode-line-mode)
 
 ;; all the icons
-(straight-use-package 'all-the-icons)
-(straight-use-package 'all-the-icons-dired)
-(add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
-(setq all-the-icons-dired-monochrome t)
+;(straight-use-package 'all-the-icons-dired)
+;(add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
+;(setq all-the-icons-dired-monochrome t)
 
 ;; general theme
 (straight-use-package 'doom-themes)
-;;(load-theme 'doom-gruvbox t)
+(load-theme 'doom-gruvbox t)
+(with-eval-after-load 'doom-themes
+  (doom-themes-treemacs-config))
+
+;; great themes:
 ;;(load-theme 'doom-monokai-pro t)
-(load-theme 'doom-nord t)
-(doom-themes-treemacs-config)
+;;(load-theme 'doom-nord t)
+;;(load-theme 'doom-opera t)
+
+
 
 ;; treemacs and config
 (straight-use-package 'treemacs)
-(global-set-key (kbd "s-t") 'treemacs)
 (progn
   (setq treemacs-space-between-root-nodes nil
-	treemacs-icons-dired-mode t)
-  (treemacs-resize-icons 16))
+        ))
+  ;;(treemacs-resize-icons 16))
 (straight-use-package 'treemacs-projectile)
 (straight-use-package 'treemacs-magit)
-(straight-use-package 'treemacs-icons-dired)
-(treemacs-icons-dired-mode)
+
+
+;; nerd icons
+
+;(straight-use-package 'all-the-icons)
+;(straight-use-package 'all-the-icons-dired)
+;(straight-use-package 'treemacs-all-the-icons)
+;(add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
+;(setq all-the-icons-dired-monochrome t)
+(straight-use-package 'all-the-icons-nerd-fonts)
+
+(use-package nerd-icons :straight t)
+(use-package treemacs-nerd-icons
+  :straight t
+  :ensure t
+  :after treemacs
+  :config
+  (treemacs-load-theme "nerd-icons"))
+
+(use-package nerd-icons-dired
+  :straight t
+  :hook
+  (dired-mode . nerd-icons-dired-mode))
+
+;(setq nerd-icons-font-family "Symbols Nerd Fonts Mono")
+
+;; if its lagging during render try this
+;;(setq inhibit-compacting-font-caches t)
+
+(setq nerd-icons-color-icons t)
+
+;; ibuffer
+(use-package nerd-icons-ibuffer
+  :straight t
+  :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
+(setq nerd-icons-ibuffer-icon t)
 
 ;; modeline
 (straight-use-package 'doom-modeline)
-(setq doom-themes-treemacs-theme "doom-colors"
+(setq ;;doom-themes-treemacs-theme "nerd-icons"
       doom-modeline-vcs-max-length 20
       doom-modeline-icon (display-graphic-p)
       doom-modeline-major-mode-color-icon t
@@ -129,9 +173,6 @@
 ;;;;;;;;;;;;;;;;;;
 
 
-;; eglot
-(straight-use-package 'eglot)
-(require 'eglot)
 
 ;; company
 (straight-use-package 'company-mode)
@@ -168,15 +209,38 @@
 (straight-use-package 'ivy)
 (ivy-mode 1)
 
+
 (straight-use-package 'counsel)
 (straight-use-package 'counsel-projectile)
 (counsel-projectile-mode)
 
 (straight-use-package 'swiper)
 
+;; (straight-use-package 'ivy-posframe)
+;; (require 'ivy-posframe)
+;; ;; display at `ivy-posframe-style'
+;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display)))
+;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-bottom-center)))
+
+;; (ivy-posframe-mode 1)
+;; (setq ivy-posframe-parameters
+;;       '((left-fringe . 8)
+;;         (top-fringe . 8)
+;;         (bottom-fringe . 8)
+;;         (right-fringe . 8)))
+
+(use-package nerd-icons-ivy-rich
+  :straight t
+  :init
+  (nerd-icons-ivy-rich-mode 1)
+  (ivy-rich-mode 1))
+
+
 (straight-use-package 'ag)
 (setq ag-highlight-search t
       ag-reuse-buffers t)
+
+
 
 ;; flycheck
 (straight-use-package 'flycheck)
@@ -215,6 +279,13 @@
 ; @todo make hydra
 
 
+;; eglot
+(straight-use-package 'project)
+(require 'project)
+(straight-use-package 'eglot)
+(require 'eglot)
+
+
 ;;;;;;;;;;;;;;;;;;
 ;; magit and vc ;;
 ;;;;;;;;;;;;;;;;;;
@@ -235,6 +306,15 @@
 ;;;;;;;;;;;;;;;;;
 ;; major modes ;;
 ;;;;;;;;;;;;;;;;;
+
+;; tree-sitter until emacs 29
+(straight-use-package 'tree-sitter)
+(straight-use-package 'tree-sitter-langs)
+
+(require 'tree-sitter)
+(require 'tree-sitter-langs)
+(global-tree-sitter-mode)
+(add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
 
 
 ;; yaml
@@ -290,6 +370,14 @@
 (straight-use-package 'markdown-mode) ; brew install marksman
 (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman")))
 (add-hook 'markdown-mode-hook #'eglot-ensure)
+
+;; mermaid
+(straight-use-package 'mermaid-mode)
+
+;; rust
+(straight-use-package 'rust-mode)
+(add-hook 'rust-mode-hook 'eglot-ensure)
+
 
 ;; web development
 ;; @todo make eslint relative to the project, not global
@@ -410,8 +498,8 @@
 ;; buffer movement
 ;; ibuffer usually with b
 (global-set-key (kbd "C-x C-b") 'ibuffer)
-(global-set-key (kbd "C-b") 'ibuffer)
-(global-set-key (kbd "M-b") 'switch-to-buffer)
+(global-set-key (kbd "M-b") 'ibuffer)
+(global-set-key (kbd "C-b") 'counsel-switch-buffer)  ;'switch-to-buffer)
 ;; default m+k for kill current buffer
 (global-set-key (kbd "s-p") 'previous-buffer)
 (global-set-key (kbd "s-n") 'next-buffer)
@@ -443,8 +531,8 @@
 
 ;; eglot
 (global-set-key (kbd "<C-return>") 'xref-find-definitions)
-(global-set-key (kbd "<s-return>") 'xref-find-references)
-(global-set-key (kbd "<M-return>") 'eglot-code-actions)
+(global-set-key (kbd "<M-return>") 'xref-find-references)
+(global-set-key (kbd "<s-return>") 'eglot-code-actions)
 
 ;; searching
 
@@ -461,4 +549,3 @@
 (global-set-key (kbd "<f1> o") 'counsel-describe-symbol)
 (global-set-key (kbd "<f1> l") 'counsel-find-library)
 
-;;; .emacs ends here
