@@ -102,8 +102,8 @@
 ;; general theme
 (straight-use-package 'doom-themes)
 (load-theme 'doom-gruvbox t)
-(with-eval-after-load 'doom-themes
-  (doom-themes-treemacs-config))
+;(with-eval-after-load 'doom-themes
+;  (doom-themes-treemacs-config))
 
 ;; great themes:
 ;;(load-theme 'doom-monokai-pro t)
@@ -129,15 +129,17 @@
 ;(straight-use-package 'treemacs-all-the-icons)
 ;(add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
 ;(setq all-the-icons-dired-monochrome t)
+
+(doom-themes-treemacs-config)
+
 (straight-use-package 'all-the-icons-nerd-fonts)
 
-(use-package nerd-icons :straight t)
-(use-package treemacs-nerd-icons
-  :straight t
-  :ensure t
-  :after treemacs
-  :config
-  (treemacs-load-theme "nerd-icons"))
+(straight-use-package 'nerd-icons)
+(require 'nerd-icons)
+
+(straight-use-package 'treemacs-nerd-icons)
+(require 'treemacs-nerd-icons)
+(treemacs-load-theme "nerd-icons")
 
 (use-package nerd-icons-dired
   :straight t
