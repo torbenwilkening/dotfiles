@@ -101,12 +101,13 @@
 
 ;; general theme
 (straight-use-package 'doom-themes)
-(load-theme 'doom-gruvbox t)
-;(with-eval-after-load 'doom-themes
-;  (doom-themes-treemacs-config))
+(load-theme 'doom-monokai-pro t)
+(with-eval-after-load 'doom-themes
+  (doom-themes-treemacs-config))
 
 ;; great themes:
-;;(load-theme 'doom-monokai-pro t)
+;;
+;;(load-theme 'doom-gruvbox t)
 ;;(load-theme 'doom-nord t)
 ;;(load-theme 'doom-opera t)
 
@@ -118,7 +119,6 @@
   (setq treemacs-space-between-root-nodes nil
         ))
   ;;(treemacs-resize-icons 16))
-(straight-use-package 'treemacs-projectile)
 (straight-use-package 'treemacs-magit)
 
 
@@ -146,7 +146,7 @@
   :hook
   (dired-mode . nerd-icons-dired-mode))
 
-;(setq nerd-icons-font-family "Symbols Nerd Fonts Mono")
+(setq nerd-icons-font-family "Ubuntu Nerd Font")
 
 ;; if its lagging during render try this
 ;;(setq inhibit-compacting-font-caches t)
@@ -203,44 +203,192 @@
 ;; delete marked region when typing
 (delete-selection-mode 1)
 
-;; projectile, ivy, counsel, swiper, ag
-(straight-use-package 'projectile)
-(setq projectile-project-search-path '("~/Projects/"))
-(setq projectile-auto-discover nil)
-
-(straight-use-package 'ivy)
-(ivy-mode 1)
 
 
-(straight-use-package 'counsel)
-(straight-use-package 'counsel-projectile)
-(counsel-projectile-mode)
+(use-package consult
+  :straight t
+  ;; Replace bindings. Lazily loaded due by `use-package'.
+  :bind (;; C-c bindings in `mode-specific-map'
+         ("C-c M-x" . consult-mode-command)
+         ("C-c h" . consult-history)
+         ("C-c k" . consult-kmacro)
+         ("C-c m" . consult-man)
+         ("C-c i" . consult-info)
+         ([remap Info-search] . consult-info)
+         ;; C-x bindings in `ctl-x-map'
+         ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+         ("C-b" . consult-buffer)                ;; orig. switch-to-buffer
+         ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+         ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+         ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
+         ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
+         ;; Custom M-# bindings for fast register access
+         ("M-#" . consult-register-load)
+         ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+         ("C-M-#" . consult-register)
+         ;; Other custom bindings
+         ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+         ;; M-g bindings in `goto-map'
+         ("M-g e" . consult-compile-error)
+         ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+         ("M-g g" . consult-goto-line)             ;; orig. goto-line
+         ("C-l"   . consult-goto-line)           ;; orig. goto-line
+         ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+         ("M-g m" . consult-mark)
+         ("M-g k" . consult-global-mark)
+         ("M-g i" . consult-imenu)
+         ("M-g I" . consult-imenu-multi)
+         ;; M-s bindings in `search-map'
+         ("M-s d" . consult-find)                  ;; Alternative: consult-fd
+         ("M-s D" . consult-locate)
+         ("M-s g" . consult-grep)
+         ("M-s G" . consult-git-grep)
+         ("M-s r" . consult-ripgrep)
+         ("C-S-s" . consult-ripgrep)
+         ("M-s l" . consult-line)
+         ("M-s L" . consult-line-multi)
+         ("M-s k" . consult-keep-lines)
+         ("M-s u" . consult-focus-lines)
+         ;; Isearch integration
+         ("M-s e" . consult-isearch-history)
+         :map isearch-mode-map
+         ("M-e"   . consult-isearch-history)         ;; orig. isearch-edit-string
+         ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+         ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+         ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+         ;; Minibuffer history
+         :map minibuffer-local-map
+         ("M-s" . consult-history)                 ;; orig. next-matching-history-element
+         ("M-r" . consult-history))                ;; orig. previous-matching-history-element
 
-(straight-use-package 'swiper)
+  ;; Enable automatic preview at point in the *Completions* buffer. This is
+  ;; relevant when you use the default completion UI.
+  :hook (completion-list-mode . consult-preview-at-point-mode)
 
-;; (straight-use-package 'ivy-posframe)
-;; (require 'ivy-posframe)
-;; ;; display at `ivy-posframe-style'
-;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display)))
-;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-bottom-center)))
+  ;; The :init configuration is always executed (Not lazy)
+  :init
 
-;; (ivy-posframe-mode 1)
-;; (setq ivy-posframe-parameters
-;;       '((left-fringe . 8)
-;;         (top-fringe . 8)
-;;         (bottom-fringe . 8)
-;;         (right-fringe . 8)))
+  ;; Optionally configure the register formatting. This improves the register
+  ;; preview for `consult-register', `consult-register-load',
+  ;; `consult-register-store' and the Emacs built-ins.
+  (setq register-preview-delay 0.5
+        register-preview-function #'consult-register-format)
 
-(use-package nerd-icons-ivy-rich
+  ;; Optionally tweak the register preview window.
+  ;; This adds thin lines, sorting and hides the mode line of the window.
+  ;;(advice-add #'register-preview :override #'consult-register-window)
+
+  ;; Use Consult to select xref locations with preview
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
+
+  ;; Configure other variables and modes in the :config section,
+  ;; after lazily loading the package.
+  :config
+
+  ;; Optionally configure preview. The default value
+  ;; is 'any, such that any key triggers the preview.
+  ;; (setq consult-preview-key 'any)
+  ;; (setq consult-preview-key "M-.")
+  ;; (setq consult-preview-key '("S-<down>" "S-<up>"))
+  ;; For some commands and buffer sources it is useful to configure the
+  ;; :preview-key on a per-command basis using the `consult-customize' macro.
+  ;; (consult-customize
+  ;;  consult-theme :preview-key '(:debounce 0.2 any)
+  ;;  consult-ripgrep consult-git-grep consult-grep
+  ;;  consult-bookmark consult-recent-file consult-xref
+  ;;  consult--source-bookmark consult--source-file-register
+  ;;  consult--source-recent-file consult--source-project-recent-file
+  ;;  ;; :preview-key "M-."
+  ;;  :preview-key '(:debounce 0.4 any))
+
+  ;; Optionally configure the narrowing key.
+  ;; Both < and C-+ work reasonably well.
+  (setq consult-narrow-key "<") ;; "C-+"
+
+  ;; Optionally make narrowing help available in the minibuffer.
+  ;; You may want to use `embark-prefix-help-command' or which-key instead.
+  ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
+
+  ;; By default `consult-project-function' uses `project-root' from project.el.
+  ;; Optionally configure a different project root function.
+  ;;;; 1. project.el (the default)
+  ;; (setq consult-project-function #'consult--default-project--function)
+  ;;;; 2. vc.el (vc-root-dir)
+  ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
+  ;;;; 3. locate-dominating-file
+  ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
+  ;;;; 4. projectile.el (projectile-project-root)
+  ;; (autoload 'projectile-project-root "projectile")
+  ;; (setq consult-project-function (lambda (_) (projectile-project-root)))
+  ;;;; 5. No project support
+  ;; (setq consult-project-function nil)
+)
+
+
+(use-package vertico
   :straight t
   :init
-  (nerd-icons-ivy-rich-mode 1)
-  (ivy-rich-mode 1))
+  (vertico-mode)
+
+  ;; Different scroll margin
+  ;; (setq vertico-scroll-margin 0)
+
+  ;; Show more candidates
+  ;; (setq vertico-count 20)
+
+  ;; Grow and shrink the Vertico minibuffer
+  ;; (setq vertico-resize t)
+
+  ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
+  (setq vertico-cycle t)
+  )
+
+;; (straight-use-package 'mini-frame)
+;; (custom-set-variables
+;;  '(mini-frame-show-parameters
+;;    '((top . 80)
+;;      (width . 0.7)
+;;      (left . 0.5))))
+;; (mini-frame-mode 1)
+
+(use-package marginalia
+  :straight t
+  ;; Bind `marginalia-cycle' locally in the minibuffer.  To make the binding
+  ;; available in the *Completions* buffer, add it to the
+  ;; `completion-list-mode-map'.
+  :bind (:map minibuffer-local-map
+         ("M-A" . marginalia-cycle))
+
+  ;; The :init section is always executed.
+  :init
+
+  ;; Marginalia must be activated in the :init section of use-package such that
+  ;; the mode gets enabled right away. Note that this forces loading the
+  ;; package.
+  (marginalia-mode))
+
+(use-package orderless
+  :straight t
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles basic partial-completion)))))
+
+;; minibuffer stuff
+;;ivy, counsel, swiper,
+;;(straight-use-package 'ivy)
+;;(ivy-mode 1)
+;;(straight-use-package 'counsel)
+;;(straight-use-package 'counsel-projectile)
+;;(counsel-projectile-mode)
+;;(straight-use-package 'swiper)
+;;(use-package nerd-icons-ivy-rich
+;;  :straight t
+;;  :init
+;;  (nerd-icons-ivy-rich-mode 1)
+;;  (ivy-rich-mode 1))
 
 
-(straight-use-package 'ag)
-(setq ag-highlight-search t
-      ag-reuse-buffers t)
 
 
 
@@ -284,6 +432,10 @@
 ;; eglot
 (straight-use-package 'project)
 (require 'project)
+(global-set-key (kbd "s-f") 'project-find-file)
+(global-set-key (kbd "s-s") 'project-switch-project)
+
+
 (straight-use-package 'eglot)
 (require 'eglot)
 
@@ -428,7 +580,7 @@
 (add-hook 'volar-vue-mode-hook #'eglot-ensure)
 (add-hook 'volar-vue-mode-hook 'vue-modes-indent-hook)
 (add-hook 'volar-vue-mode-hook 'flycheck-mode)
-(add-to-list 'eglot-server-programs '(volar-vue-mode "vue-language-server", "--stdio"))
+(add-to-list 'eglot-server-programs '(volar-vue-mode "vue-language-server" "--stdio"))
 (flycheck-add-mode 'javascript-eslint 'volar-vue-mode)
 
 
@@ -500,27 +652,30 @@
 ;; buffer movement
 ;; ibuffer usually with b
 (global-set-key (kbd "C-x C-b") 'ibuffer)
-(global-set-key (kbd "M-b") 'ibuffer)
-(global-set-key (kbd "C-b") 'counsel-switch-buffer)  ;'switch-to-buffer)
+;;(global-set-key (kbd "M-b") 'ibuffer)
+
+;;(global-set-key (kbd "C-b") 'counsel-switch-buffer)  ;'switch-to-buffer)
 ;; default m+k for kill current buffer
+
 (global-set-key (kbd "s-p") 'previous-buffer)
 (global-set-key (kbd "s-n") 'next-buffer)
 (global-set-key (kbd "s-k") 'kill-current-buffer)
-(global-set-key (kbd "s-f") 'projectile-find-file)
-(global-set-key (kbd "s-s") 'projectile-switch-project)
 (global-set-key (kbd "s-e") 'treemacs)
+;;(global-set-key (kbd "C-S-s") 'ag-project)
+
 ;; replaces i-search with swiper
-(global-set-key (kbd "C-s") 'swiper)
-(global-set-key (kbd "C-S-s") 'ag-project)
+;;(global-set-key (kbd "C-s") 'swiper)
+
+
 ;; default find file
-(global-set-key (kbd "C-x C-f") 'counsel-find-file)
+;;(global-set-key (kbd "C-x C-f") 'counsel-find-file)
 ;; gives M-x command counsel features
-(global-set-key (kbd "M-x") 'counsel-M-x)
+;;(global-set-key (kbd "M-x") 'counsel-M-x)
 
 ;; editor movement
 ;; use M+L for go to line
 
-(global-set-key (kbd "M-l") 'goto-line)
+;;(global-set-key (kbd "M-l") 'goto-line)
 ;; use M+<arrow> for multiple lines
 (global-set-key (kbd "M-<down>")
                 (lambda () (interactive) (forward-line  8)))
@@ -530,6 +685,7 @@
 ;; code modification
 (global-set-key (kbd "C-u") 'undo)
 ;;(global-set-key (kbd "C-m") 'mc/edit-lines)
+(global-set-key (kbd "C-f") 'consult-line)
 
 ;; eglot
 (global-set-key (kbd "<C-return>") 'xref-find-definitions)
@@ -546,8 +702,9 @@
 ;;
 
 ;; help
-(global-set-key (kbd "<f1> f") 'counsel-describe-function)
-(global-set-key (kbd "<f1> v") 'counsel-describe-variable)
-(global-set-key (kbd "<f1> o") 'counsel-describe-symbol)
-(global-set-key (kbd "<f1> l") 'counsel-find-library)
+;;(global-set-key (kbd "<f1> f") 'counsel-describe-function)
+;;(global-set-key (kbd "<f1> v") 'counsel-describe-variable)
+;;(global-set-key (kbd "<f1> o") 'counsel-describe-symbol)
+;;(global-set-key (kbd "<f1> l") 'counsel-find-library)
+
 
