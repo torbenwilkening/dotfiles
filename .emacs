@@ -69,6 +69,17 @@
 ;;  (exec-path-from-shell-initialize))
 ;;(exec-path-from-shell-copy-env "PATH")
 
+;; setup world clocks
+(setq world-clock-list
+      '(
+        ("EST" "Toronto")
+        ;;      ("PST" "PST")
+        ;;      ("UTC" "UTC")
+        ("Europe/Berlin" "Hamburg")))
+
+(setq world-clock-time-format "%a, %d. %b %R %Z")
+
+
 ;; spaces instead of tabs by default
 (setq-default indent-tabs-mode nil)
 
@@ -169,6 +180,40 @@
       doom-modeline-display-default-persp-name nil
       doom-modeline-buffer-encoding nil)
 
+
+;; notifications
+(use-package alert
+  :straight t
+  :config
+  (if (eq system-type 'darwin)
+      (setq
+       ;; alert-default-style 'notifier
+       alert-default-style 'osx-notifier
+       )))
+
+
+;; chatgpt
+(use-package shell-maker
+  :straight (:host github :repo "xenodium/chatgpt-shell" :files ("shell-maker.el")))
+
+(use-package chatgpt-shell
+  :requires shell-maker
+  :straight (:host github :repo "xenodium/chatgpt-shell" :files ("chatgpt-shell.el")))
+
+;; # cat ~/.authinfo
+;; machine api.openai.com password <APIKEY>
+(setq chatgpt-shell-openai-key
+      (auth-source-pick-first-password :host "api.openai.com"))
+
+
+;; if you are using the "pass" password manager
+;;(setq chatgpt-shell-openai-key
+;;      (lambda ()
+;;        ;; (auth-source-pass-get 'secret "openai-key") ; alternative using pass support in auth-sources
+;;        ;; (nth 0 (process-lines "pass" "show" "openai-key"))))
+
+
+    
 
 ;;;;;;;;;;;;;;;;;;
 ;; lsp features ;;
@@ -374,22 +419,6 @@
   (completion-styles '(orderless basic))
   (completion-category-overrides '((file (styles basic partial-completion)))))
 
-;; minibuffer stuff
-;;ivy, counsel, swiper,
-;;(straight-use-package 'ivy)
-;;(ivy-mode 1)
-;;(straight-use-package 'counsel)
-;;(straight-use-package 'counsel-projectile)
-;;(counsel-projectile-mode)
-;;(straight-use-package 'swiper)
-;;(use-package nerd-icons-ivy-rich
-;;  :straight t
-;;  :init
-;;  (nerd-icons-ivy-rich-mode 1)
-;;  (ivy-rich-mode 1))
-
-
-
 
 
 ;; flycheck
@@ -484,6 +513,8 @@
 
 ;; graphql
 (straight-use-package 'graphql-mode)
+(add-hook 'graphql-mode-hook #'eglot-ensure)
+(add-to-list 'eglot-server-programs '(graphql-mode . ("graphql-lsp" "server" "-m" "stream")))
 
 ;; kubernetes
 (straight-use-package 'kubernetes)
@@ -549,7 +580,7 @@
 (add-hook 'typescript-mode-hook 'js-modes-indent-hook)
 (add-hook 'typescript-mode-hook #'eglot-ensure)
 (add-hook 'typescript-mode-hook 'flycheck-mode)
-(add-to-list 'eglot-server-programs '(typescript-mode . ("typescript-language-server" "--stdio")))
+(add-to-list 'eglot-server-programs '(typescript-mode . ("bunx" "typescript-language-server" "--stdio")))
 (flycheck-add-mode 'javascript-eslint 'typescript-mode)
 
 (add-to-list 'auto-mode-alist '("\\.js\\'" . typescript-mode))
@@ -571,7 +602,7 @@
 (add-hook 'vetur-vue-mode-hook #'eglot-ensure)
 (add-hook 'vetur-vue-mode-hook 'vue-modes-indent-hook)
 (add-hook 'vetur-vue-mode-hook 'flycheck-mode)
-(add-to-list 'eglot-server-programs '(vetur-vue-mode "vls"))
+(add-to-list 'eglot-server-programs '(vetur-vue-mode "bunx" "vls"))
 (flycheck-add-mode 'javascript-eslint 'vetur-vue-mode)
 
 ;; vue3 with volar (currently disabled until stable)
@@ -580,7 +611,7 @@
 (add-hook 'volar-vue-mode-hook #'eglot-ensure)
 (add-hook 'volar-vue-mode-hook 'vue-modes-indent-hook)
 (add-hook 'volar-vue-mode-hook 'flycheck-mode)
-(add-to-list 'eglot-server-programs '(volar-vue-mode "vue-language-server" "--stdio"))
+(add-to-list 'eglot-server-programs '(volar-vue-mode "bunx" "vue-language-server" "--stdio"))
 (flycheck-add-mode 'javascript-eslint 'volar-vue-mode)
 
 
@@ -595,7 +626,7 @@
 
 ;; @todo vue3 with volar
 ;; (add-to-list 'eglot-server-programs
-;;              '(vue-mode . (eglot-volar "vue-language-server" "--stdio")))
+;;              '(volar-vue-mode . (eglot-volar "vue-language-server" "--stdio")))
 ;; (defclass eglot-volar (eglot-lsp-server) ()
 ;;   :documentation "A custom class for volar")
 ;; (cl-defmethod eglot-initialization-options ((server eglot-volar))
@@ -604,7 +635,7 @@
 ;;       ((serverPath
 ;;         (expand-file-name
 ;;          "lib"
-;; 	 "/Users/torbenwilkening/.asdf/installs/nodejs/16.19.0/lib/node_modules/typescript"
+;; 	 "/Users/torbenwilkening/.asdf/installs/nodejs/20.8.0/lib/node_modules/typescript"
 ;; 	 )))
 ;;     (list :typescript
 ;;           (list :tsdk serverPath)
@@ -622,7 +653,7 @@
 ;;                       :getDocumentPrintWidthRequest nil)
 ;;                 :documentSymbol t
 ;;                 :documentColor t))))
-;;
+
 ;; @todo fix this paths
 ;;"/Users/torbenwilkening/.asdf/installs/nodejs/16.19.0/lib"
 ;; /Users/torbenwilkening/.asdf/installs/nodejs/16.19.0/lib/node_modules/typescript
@@ -697,8 +728,8 @@
 ;; compiler
 
 ;; multi cursor
-;;(global-set-key (kbd "C->") 'mc/mark-next-like-this)
-;;(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C->") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
 ;;
 
 ;; help
