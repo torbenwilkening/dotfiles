@@ -200,7 +200,7 @@
   :requires shell-maker
   :straight (:host github :repo "xenodium/chatgpt-shell" :files ("chatgpt-shell.el")))
 
-;; # cat ~/.authinfo
+;; $ cat ~/.authinfo
 ;; machine api.openai.com password <APIKEY>
 (setq chatgpt-shell-openai-key
       (auth-source-pick-first-password :host "api.openai.com"))
@@ -211,6 +211,26 @@
 ;;      (lambda ()
 ;;        ;; (auth-source-pass-get 'secret "openai-key") ; alternative using pass support in auth-sources
 ;;        ;; (nth 0 (process-lines "pass" "show" "openai-key"))))
+
+;; some functions
+
+(require 'url)
+(require 'json)
+
+(defun insert-json-at-point ()
+  "Get data from URL and insert the response."
+  (url-retrieve "https://api.example.com/data.json"
+                (lambda (status)
+                  (goto-char (point-min))
+                  (re-search-forward "^$")
+                  (let ((data (json-read)))
+                    (kill-buffer)
+                    (insert (format "JSON data: %S" data))))))
+
+(defun insert-random-text-at-point ()
+  "Insert the response of the URL at the current cursor position."
+  (interactive)
+  (url-insert-file-contents "http://metaphorpsum.com/paragraphs/1"))
 
 
     
