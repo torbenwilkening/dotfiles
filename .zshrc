@@ -146,3 +146,9 @@ source "$HOME/.cargo/env"
 alias ll='exa --long --icons'
 alias ls='exa --icons'
 
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+
+curl "wttr.in/hamburg?1"
