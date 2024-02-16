@@ -72,7 +72,7 @@
 ;; setup world clocks
 (setq world-clock-list
       '(
-        ("EST" "Toronto")
+        ;;      ("EST" "Toronto")
         ;;      ("PST" "PST")
         ;;      ("UTC" "UTC")
         ("Europe/Berlin" "Hamburg")))
@@ -444,7 +444,7 @@
 ;; flycheck
 (straight-use-package 'flycheck)
 (global-flycheck-mode)
-(flymake-mode -1)
+;;(flymake-mode -1)
 
 ;; yasnippet
 (straight-use-package 'yasnippet)
@@ -455,8 +455,8 @@
 (straight-use-package 'smartparens)
 (require 'smartparens-config)
 (add-hook 'typescript-mode-hook #'smartparens-mode)
-(add-hook 'volar-vue-mode-hook #'smartparens-mode)
-(add-hook 'vetur-vue-mode-hook #'smartparens-mode)
+;;(add-hook 'volar-vue-mode-hook #'smartparens-mode)
+;;(add-hook 'vetur-vue-mode-hook #'smartparens-mode)
 (add-hook 'web-mode-hook #'smartparens-mode)
 (add-hook 'python-mode-hook #'smartparens-mode)
 (add-hook 'go-mode-hook #'smartparens-mode)
@@ -600,7 +600,8 @@
 (add-hook 'typescript-mode-hook 'js-modes-indent-hook)
 (add-hook 'typescript-mode-hook #'eglot-ensure)
 (add-hook 'typescript-mode-hook 'flycheck-mode)
-(add-to-list 'eglot-server-programs '(typescript-mode . ("bunx" "typescript-language-server" "--stdio")))
+(add-to-list 'eglot-server-programs '(typescript-mode . ("typescript-language-server" "--stdio")))
+;;(add-to-list 'eglot-server-programs '(typescript-mode . ("typescript-language-server" "--stdio")))
 (flycheck-add-mode 'javascript-eslint 'typescript-mode)
 
 (add-to-list 'auto-mode-alist '("\\.js\\'" . typescript-mode))
@@ -615,24 +616,30 @@
   (setq typescript-indent-level 2)
   (setq js-jsx-indent-level 2))
 
+
+;;;;;;;;;;;;
+;; vue.js ;;
+;;;;;;;;;;;;
+
 ;; vue2 with vetur
 (define-derived-mode vetur-vue-mode web-mode "Vue2"
   "A major mode derived from vue-mode with vetur language server")
-(add-to-list 'auto-mode-alist '("\\.vue\\'" . vetur-vue-mode))
 (add-hook 'vetur-vue-mode-hook #'eglot-ensure)
 (add-hook 'vetur-vue-mode-hook 'vue-modes-indent-hook)
 (add-hook 'vetur-vue-mode-hook 'flycheck-mode)
-(add-to-list 'eglot-server-programs '(vetur-vue-mode "bunx" "vls"))
+(add-to-list 'eglot-server-programs '(vetur-vue-mode "vls"))
 (flycheck-add-mode 'javascript-eslint 'vetur-vue-mode)
 
-;; vue3 with volar (currently disabled until stable)
+;; vue3 with volar
 (define-derived-mode volar-vue-mode web-mode "Vue3"
   "A major mode derived from vue-mode with volar language server")
+;;(add-to-list 'auto-mode-alist '("\\.vue\\'" . volar-vue-mode))
 (add-hook 'volar-vue-mode-hook #'eglot-ensure)
 (add-hook 'volar-vue-mode-hook 'vue-modes-indent-hook)
-(add-hook 'volar-vue-mode-hook 'flycheck-mode)
-(add-to-list 'eglot-server-programs '(volar-vue-mode "bunx" "vue-language-server" "--stdio"))
-(flycheck-add-mode 'javascript-eslint 'volar-vue-mode)
+;;(add-hook 'volar-vue-mode-hook 'flycheck-mode)
+(add-to-list 'eglot-server-programs '(volar-vue-mode "vue-language-server" "--stdio"))
+;;(add-to-list 'eglot-server-programs '(volar-vue-mode "bunx" "vue-language-server" "--stdio"))
+;;(flycheck-add-mode 'javascript-eslint 'volar-vue-mode)
 
 
 (defun vue-modes-indent-hook ()
@@ -681,6 +688,11 @@
 ;; non-osx: (shell-command-to-string "npm list --global --parseable typescript | head -n1 | tr -d \"\n\""))))
 
 
+
+;; use either vetur (old vue2) or volar (vue3)
+;; one of these lines
+;;(add-to-list 'auto-mode-alist '("\\.vue\\'" . vetur-vue-mode))
+(add-to-list 'auto-mode-alist '("\\.vue\\'" . volar-vue-mode))
 
 
 ;;;;;;;;;;;;;;;;;;;
@@ -757,5 +769,3 @@
 ;;(global-set-key (kbd "<f1> v") 'counsel-describe-variable)
 ;;(global-set-key (kbd "<f1> o") 'counsel-describe-symbol)
 ;;(global-set-key (kbd "<f1> l") 'counsel-find-library)
-
-
