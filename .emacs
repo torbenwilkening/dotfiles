@@ -112,12 +112,13 @@
 
 ;; general theme
 (straight-use-package 'doom-themes)
-(load-theme 'doom-monokai-pro t)
+(load-theme 'doom-molokai t) 
 (with-eval-after-load 'doom-themes
   (doom-themes-treemacs-config))
 
 ;; great themes:
 ;;
+;;(load-theme 'doom-molokai t)
 ;;(load-theme 'doom-gruvbox t)
 ;;(load-theme 'doom-nord t)
 ;;(load-theme 'doom-opera t)
@@ -193,6 +194,7 @@
 
 
 ;; chatgpt
+(require 'auth-source)
 (use-package shell-maker
   :straight (:host github :repo "xenodium/chatgpt-shell" :files ("shell-maker.el")))
 
@@ -251,7 +253,7 @@
       company-minimum-prefix-length 1 ; after first character
       company-begin-commands '(self-insert-command) ; only after typing
       completion-ignore-case nil)
-
+(global-set-key (kbd "C-c y") 'company-yasnippet)
 
 ;;;;;;;;;;;;;;;;;;
 ;; global modes ;;
@@ -455,8 +457,6 @@
 (straight-use-package 'smartparens)
 (require 'smartparens-config)
 (add-hook 'typescript-mode-hook #'smartparens-mode)
-;;(add-hook 'volar-vue-mode-hook #'smartparens-mode)
-;;(add-hook 'vetur-vue-mode-hook #'smartparens-mode)
 (add-hook 'web-mode-hook #'smartparens-mode)
 (add-hook 'python-mode-hook #'smartparens-mode)
 (add-hook 'go-mode-hook #'smartparens-mode)
@@ -549,11 +549,6 @@
              '("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode))
 (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
 
-;; scala
-(straight-use-package 'scala-mode)
-(add-hook 'scala-mode-hook #'eglot-ensure)
-(straight-use-package 'sbt-mode)
-(add-to-list 'auto-mode-alist '("\\.scala\\'" . scala-mode))
 
 ;; go
 (straight-use-package 'go-mode)
@@ -589,11 +584,23 @@
 ;; @todo disable flymake in favor of flycheck
 
 ;; html / css
+;; run: npm i -g vscode-langservers-extracted
+
+;; web-mode
 (straight-use-package 'web-mode)
 (add-hook 'web-mode-hook #'eglot-ensure)
 (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.scss\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.css\\'" . css-mode))
+(add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
+
+;; css-mode / scss-mode
+(defun css-mode-indent-hook ()
+  "Indentation for SCSS/CSS"
+  (setq css-indent-offset 2))
+(add-hook 'css-mode-hook 'css-mode-indent-hook)
+(add-hook 'css-mode-hook #'eglot-ensure)
+(add-hook 'scss-mode-hook 'css-mode-indent-hook)
+(add-hook 'scss-mode-hook #'eglot-ensure)
 
 ;; typescript / javascript
 (straight-use-package 'typescript-mode)
@@ -602,7 +609,8 @@
 (add-hook 'typescript-mode-hook 'flycheck-mode)
 (add-to-list 'eglot-server-programs '(typescript-mode . ("typescript-language-server" "--stdio")))
 ;;(add-to-list 'eglot-server-programs '(typescript-mode . ("typescript-language-server" "--stdio")))
-(flycheck-add-mode 'javascript-eslint 'typescript-mode)
+;;(flycheck-add-mode 'javascript-eslint 'typescript-mode)
+(straight-use-package 'prettier-js)
 
 (add-to-list 'auto-mode-alist '("\\.js\\'" . typescript-mode))
 (add-to-list 'auto-mode-alist '("\\.mjs\\'" . typescript-mode))
@@ -616,33 +624,22 @@
   (setq typescript-indent-level 2)
   (setq js-jsx-indent-level 2))
 
+;;(straight-use-package 'prettier-js :ensure t)
+;;(add-hook 'web-mode-hook 'prettier-js-mode)
+
 
 ;;;;;;;;;;;;
 ;; vue.js ;;
 ;;;;;;;;;;;;
 
-;; vue2 with vetur
-(define-derived-mode vetur-vue-mode web-mode "Vue2"
-  "A major mode derived from vue-mode with vetur language server")
-(add-hook 'vetur-vue-mode-hook #'eglot-ensure)
-(add-hook 'vetur-vue-mode-hook 'vue-modes-indent-hook)
-(add-hook 'vetur-vue-mode-hook 'flycheck-mode)
-(add-to-list 'eglot-server-programs '(vetur-vue-mode "vls"))
-(flycheck-add-mode 'javascript-eslint 'vetur-vue-mode)
-
-;; vue3 with volar
-(define-derived-mode volar-vue-mode web-mode "Vue3"
-  "A major mode derived from vue-mode with volar language server")
-;;(add-to-list 'auto-mode-alist '("\\.vue\\'" . volar-vue-mode))
-(add-hook 'volar-vue-mode-hook #'eglot-ensure)
-(add-hook 'volar-vue-mode-hook 'vue-modes-indent-hook)
-;;(add-hook 'volar-vue-mode-hook 'flycheck-mode)
-(add-to-list 'eglot-server-programs '(volar-vue-mode "vue-language-server" "--stdio"))
-;;(add-to-list 'eglot-server-programs '(volar-vue-mode "bunx" "vue-language-server" "--stdio"))
-;;(flycheck-add-mode 'javascript-eslint 'volar-vue-mode)
+;;npm install -g typescript-language-server
+;; for volar
+;;npm install -g @vue/language-server
+;; for vetur
+;;npm install vls -g
 
 
-(defun vue-modes-indent-hook ()
+(defun web-modes-indent-hook ()
   "Indent settings for web-mode"
   (setq web-mode-script-padding 0)
   (setq web-mode-markup-indent-offset 2)
@@ -650,49 +647,73 @@
   (setq web-mode-style-padding 0)
   (setq web-mode-code-indent-offset 2))
 
+(add-hook 'web-mode-hook  'web-modes-indent-hook)
 
-;; @todo vue3 with volar
-;; (add-to-list 'eglot-server-programs
-;;              '(volar-vue-mode . (eglot-volar "vue-language-server" "--stdio")))
-;; (defclass eglot-volar (eglot-lsp-server) ()
-;;   :documentation "A custom class for volar")
-;; (cl-defmethod eglot-initialization-options ((server eglot-volar))
-;;   "Passes through required volar initialization options"
-;;   (let*
-;;       ((serverPath
-;;         (expand-file-name
-;;          "lib"
-;; 	 "/Users/torbenwilkening/.asdf/installs/nodejs/20.8.0/lib/node_modules/typescript"
-;; 	 )))
-;;     (list :typescript
-;;           (list :tsdk serverPath)
-;;           :languageFeatures
-;;           (list :completion
-;;                 (list :defaultTagNameCase "both"
-;;                       :defaultAttrNameCase "kebabCase"
-;;                       :getDocumentNameCasesRequest nil
-;;                       :getDocumentSelectionRequest nil)
-;;                 :diagnostics
-;;                 (list :getDocumentVersionRequest nil))
-;;           :documentFeatures
-;;           (list :documentFormatting
-;;                 (list :defaultPrintWidth 100
-;;                       :getDocumentPrintWidthRequest nil)
-;;                 :documentSymbol t
-;;                 :documentColor t))))
+;; add flymake and let eglot stay out of it
+(straight-use-package 'flymake-eslint)
+(add-hook 'web-mode-hook ; or whatever the mode-hook is for your mode of choice
+  (lambda ()
+    (flymake-eslint-enable)))
+(setq eglot-stay-out-of '(flymake))
+(add-hook 'eglot--managed-mode-hook (lambda () (add-hook 'flymake-diagnostic-functions 'eglot-flymake-backend nil t)))
 
-;; @todo fix this paths
-;;"/Users/torbenwilkening/.asdf/installs/nodejs/16.19.0/lib"
-;; /Users/torbenwilkening/.asdf/installs/nodejs/16.19.0/lib/node_modules/typescript
-;;(string-trim-right (shell-command-to-string "npm list --global --parseable typescript | head -n1"))
-;; non-osx: (shell-command-to-string "npm list --global --parseable typescript | head -n1 | tr -d \"\n\""))))
 
+;; vue2 with vetur
+(define-derived-mode vetur-vue-mode web-mode "Vue2"
+  "A major mode derived from vue-mode with vetur language server")
+(add-hook 'vetur-vue-mode-hook #'eglot-ensure)
+(add-hook 'vetur-vue-mode-hook 'web-modes-indent-hook)
+(add-to-list 'eglot-server-programs '(vetur-vue-mode "vls"))
+;;(flycheck-add-mode 'javascript-eslint 'vetur-vue-mode)
+
+
+
+;; vue3 with volar (works!!)
+(defun volar-custom-hooks ()
+  (flycheck-mode t)
+  (eglot-ensure))
+(defun volar-eglot-init-options ()
+  (let ((tsdk-path (expand-file-name
+                    "lib"
+                    (string-trim-right (shell-command-to-string "npm list --global --parseable typescript | head -n1"))
+                    )))
+    `(:typescript (:tsdk ,tsdk-path
+                         :languageFeatures (:completion
+                                            (:defaultTagNameCase "both"
+                                                                 :defaultAttrNameCase "kebabCase"
+                                                                 :getDocumentNameCasesRequest t
+                                                                 :getDocumentSelectionRequest t)
+                                            :diagnostics
+                                            (:getDocumentVersionRequest t))
+                         :documentFeatures (:documentFormatting
+                                            (:defaultPrintWidth 100
+                                                                :getDocumentPrintWidthRequest t)
+                                            :documentSymbol t
+                                            :documentColor t)
+                         ))))
+(define-derived-mode volar-vue-mode web-mode "Vue3"
+   "A major mode derived from vue-mode with volar language server")
+(add-hook 'volar-vue-mode-hook 'web-modes-indent-hook)
+(add-hook 'volar-vue-mode-hook 'volar-custom-hooks)
+;; (add-to-list 'eglot-server-programs '(volar-vue-mode "vue-language-server" "--stdio"))
+;;(add-to-list 'eglot-server-programs '(volar-vue-mode "vue-language-server" "--stdio"))
+;;(flycheck-add-mode 'javascript-eslint 'volar-vue-mode)
+(add-to-list 'eglot-server-programs
+             `(volar-vue-mode . ("vue-language-server" "--stdio" :initializationOptions ,(volar-eglot-init-options))))
+
+
+;; add some smartparens-mode
+;;(add-hook 'volar-vue-mode-hook #'smartparens-mode)
+;;(add-hook 'vetur-vue-mode-hook #'smartparens-mode)
 
 
 ;; use either vetur (old vue2) or volar (vue3)
 ;; one of these lines
-;;(add-to-list 'auto-mode-alist '("\\.vue\\'" . vetur-vue-mode))
-(add-to-list 'auto-mode-alist '("\\.vue\\'" . volar-vue-mode))
+(add-to-list 'auto-mode-alist '("\\.vue\\'" . vetur-vue-mode))
+;;(add-to-list 'auto-mode-alist '("\\.vue\\'" . volar-vue-mode))
+
+
+
 
 
 ;;;;;;;;;;;;;;;;;;;
@@ -769,3 +790,36 @@
 ;;(global-set-key (kbd "<f1> v") 'counsel-describe-variable)
 ;;(global-set-key (kbd "<f1> o") 'counsel-describe-symbol)
 ;;(global-set-key (kbd "<f1> l") 'counsel-find-library)
+
+
+;; scala
+(use-package scala-mode
+  :straight t
+  :interpreter ("scala" . scala-mode))
+
+;; Enable sbt mode for executing sbt commands
+(use-package sbt-mode
+  :straight t
+  :commands sbt-start sbt-command
+  :config
+  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+  ;; allows using SPACE when in the minibuffer
+  (substitute-key-definition
+   'minibuffer-complete-word
+   'self-insert-command
+   minibuffer-local-completion-map)
+   ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
+   (setq sbt:program-options '("-Dsbt.supershell=false")))
+
+(add-hook 'scala-mode-hook #'eglot-ensure)
+
+(add-to-list 'auto-mode-alist '("\\.s\\(cala\\|bt\\)$" . scala-mode))
+
+;; coursier bootstrap \
+;;  --java-opt -Xss4m \
+;;  --java-opt -Xms100m \
+;;  --java-opt -Dmetals.client=emacs \
+;;  org.scalameta:metals_2.13:1.3.4 \
+;;  -r bintray:scalacenter/releases \
+;;  -r sonatype:snapshots \
+;;  -o /usr/local/bin/metals-emacs -f
