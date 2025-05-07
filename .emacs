@@ -98,8 +98,8 @@
 (add-to-list 'default-frame-alist '(ns-appearance . dark))
 (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
 
-;; a little bit window transparency is an option
-;; (set-frame-parameter (selected-frame) 'alpha '(99 99))
+;; a little bit window opacity is an option
+(set-frame-parameter (selected-frame) 'alpha '(95 95))
 
 ;; hide modeline in certain major modes
 (straight-use-package 'hide-mode-line)
@@ -112,9 +112,9 @@
 
 ;; general theme
 (straight-use-package 'doom-themes)
-(load-theme 'doom-molokai t) 
 (with-eval-after-load 'doom-themes
   (doom-themes-treemacs-config))
+(straight-use-package 'catppuccin-theme)
 
 ;; great themes:
 ;;
@@ -122,6 +122,8 @@
 ;;(load-theme 'doom-gruvbox t)
 ;;(load-theme 'doom-nord t)
 ;;(load-theme 'doom-opera t)
+;;(load-theme 'doom-molokai t)
+(load-theme 'catppuccin t)
 
 
 
@@ -547,7 +549,7 @@
 (add-hook 'enh-ruby-mode-hook #'eglot-ensure)
 (add-to-list 'auto-mode-alist
              '("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode))
-(add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
+;;(add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
 
 
 ;; go
@@ -765,6 +767,10 @@
                 (lambda () (interactive) (forward-line  8)))
 (global-set-key (kbd "M-<up>")
                 (lambda () (interactive) (forward-line -8)))
+(global-set-key (kbd "C-n")
+                (lambda () (interactive) (forward-line  24)))
+(global-set-key (kbd "C-p")
+                (lambda () (interactive) (forward-line -24)))
 
 ;; code modification
 (global-set-key (kbd "C-u") 'undo)
@@ -823,3 +829,4 @@
 ;;  -r bintray:scalacenter/releases \
 ;;  -r sonatype:snapshots \
 ;;  -o /usr/local/bin/metals-emacs -f
+
