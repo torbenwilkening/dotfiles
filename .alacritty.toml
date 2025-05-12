@@ -1,0 +1,23 @@
+[window]
+decorations = "transparent"
+opacity = 0.95
+title = "Its me your Terminal"
+
+
+padding.x = 12
+padding.y = 30
+
+[font.normal]
+family = "Hack Nerd Font"
+style = "Regular"
+
+[font.bold]
+family = "Hack Nerd Font"
+style = "Bold"
+
+[font.italic]
+family = "Hack Nerd Font"
+style = "Italic"
+
+[colors]
+primary.background = "#1e1e2e"
