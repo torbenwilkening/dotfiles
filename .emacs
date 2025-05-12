@@ -1,3 +1,16 @@
+
+
+;; HACK Work around native compilation on macOS failing with 'ld: library not
+;; found for -lemutls_w'.
+;; https://github.com/d12frosted/homebrew-emacs-plus/issues/554
+(setenv "LIBRARY_PATH"
+	(string-join
+	 '("/opt/homebrew/opt/gcc/lib/gcc/14"
+	   "/opt/homebrew/opt/libgccjit/lib/gcc/14"
+	   "/opt/homebrew/opt/gcc/lib/gcc/14/gcc/aarch64-apple-darwin24/14")
+	 ":"))
+
+
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -86,6 +99,10 @@
 ;; vterm (install libvterm on your machine)
 (straight-use-package 'vterm)
 
+;; direnv
+(straight-use-package 'direnv)
+(require 'direnv)
+
 ;;;;;;;;;;;;;
 ;; theming ;;
 ;;;;;;;;;;;;;
@@ -111,9 +128,9 @@
 ;(setq all-the-icons-dired-monochrome t)
 
 ;; general theme
-(straight-use-package 'doom-themes)
-(with-eval-after-load 'doom-themes
-  (doom-themes-treemacs-config))
+;;(straight-use-package 'doom-themes)
+;;(with-eval-after-load 'doom-themes
+;;  (doom-themes-treemacs-config))
 (straight-use-package 'catppuccin-theme)
 
 ;; great themes:
@@ -144,7 +161,7 @@
 ;(add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
 ;(setq all-the-icons-dired-monochrome t)
 
-(doom-themes-treemacs-config)
+;;(doom-themes-treemacs-config)
 
 (straight-use-package 'all-the-icons-nerd-fonts)
 
@@ -196,18 +213,18 @@
 
 
 ;; chatgpt
-(require 'auth-source)
-(use-package shell-maker
-  :straight (:host github :repo "xenodium/chatgpt-shell" :files ("shell-maker.el")))
+;; (require 'auth-source)
+;; (use-package shell-maker
+;;   :straight (:host github :repo "xenodium/chatgpt-shell" :files ("shell-maker.el")))
 
-(use-package chatgpt-shell
-  :requires shell-maker
-  :straight (:host github :repo "xenodium/chatgpt-shell" :files ("chatgpt-shell.el")))
+;; (use-package chatgpt-shell
+;;   :requires shell-maker
+;;   :straight (:host github :repo "xenodium/chatgpt-shell" :files ("chatgpt-shell.el")))
 
 ;; $ cat ~/.authinfo
 ;; machine api.openai.com password <APIKEY>
-(setq chatgpt-shell-openai-key
-      (auth-source-pick-first-password :host "api.openai.com"))
+;; (setq chatgpt-shell-openai-key
+;;       (auth-source-pick-first-password :host "api.openai.com"))
 
 
 ;; if you are using the "pass" password manager
@@ -254,7 +271,8 @@
       company-echo-delay 0
       company-minimum-prefix-length 1 ; after first character
       company-begin-commands '(self-insert-command) ; only after typing
-      completion-ignore-case nil)
+      ;;completion-ignore-case nil
+      )
 (global-set-key (kbd "C-c y") 'company-yasnippet)
 
 ;;;;;;;;;;;;;;;;;;
@@ -511,6 +529,17 @@
 ;;;;;;;;;;;;;;;;;
 ;; major modes ;;
 ;;;;;;;;;;;;;;;;;
+
+
+;; nix
+(straight-use-package 'nix-mode)
+(use-package eglot
+  :config
+  ;; Ensure `nil` is in your PATH.
+  (add-to-list 'eglot-server-programs '(nix-mode . ("nil")))
+  :hook
+  (nix-mode . eglot-ensure))
+(add-to-list 'auto-mode-alist '("\\.nix\\'" . nix-mode))
 
 ;; tree-sitter until emacs 29
 (straight-use-package 'tree-sitter)
