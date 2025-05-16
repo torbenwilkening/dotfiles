@@ -56,8 +56,8 @@
 
 ;; backup and autosave
 (setq make-backup-files nil)
-(setq auto-save-file-name-transforms
-  `((".*" "~/.emacs-saves/" t)))
+;; (setq auto-save-file-name-transforms
+;;   `((".*" "~/.emacs-saves/" t)))
 
 ;; default window sizesf
 (setq compilation-window-height 12)
