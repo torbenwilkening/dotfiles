@@ -1,21 +1,19 @@
 # If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
+# export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
-# Path to your oh-my-zsh installation.
-export ZSH="$HOME/.oh-my-zsh"
+# Path to your Oh My Zsh installation.
+# on default
+# export ZSH="$HOME/.oh-my-zsh"
+# with nix
+export ZSH=$HOME/.nix-profile/share/oh-my-zsh
 
 # Set name of the theme to load --- if set to "random", it will
-# load a random theme each time oh-my-zsh is loaded, in which case,
+# load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-# great stuff: macovsky muse sonicradish
-ZSH_THEME="oxide"
-# using this: https://github.com/spaceship-prompt/spaceship-prompt
-# more good options
-# https://github.com/ohmyzsh/ohmyzsh/wiki/External-themes#guezwhoz
-# https://github.com/ohmyzsh/ohmyzsh/wiki/External-themes#oxide
-# https://github.com/ohmyzsh/ohmyzsh/wiki/External-themes#node-theme
 
+# great stuff: macovsky muse sonicradish
+ZSH_THEME="macovsky"
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -48,7 +46,7 @@ ZSH_THEME="oxide"
 # DISABLE_AUTO_TITLE="true"
 
 # Uncomment the following line to enable command auto-correction.
-ENABLE_CORRECTION="true"
+# ENABLE_CORRECTION="true"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
 # You can also set it to another string to have that shown instead of the default red dots.
@@ -77,36 +75,21 @@ ENABLE_CORRECTION="true"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
+
+
+source <(fzf --zsh)
+
 plugins=(
-    ag
-    asdf
-    brew
-    bun
-    bundler
     docker
     dotenv
-    encode64
-    gem
+    emoji
+    fzf
     git
-    github
-    golang
     kubectl
     man
     node
-    perl
-    pip
-    pyenv
     python
-    qrcode
-    rails
-    rake
-    ruby
-    rust
-    sbt
-    scala
     sudo
-    tmux
-    yarn
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -119,18 +102,21 @@ source $ZSH/oh-my-zsh.sh
 # export LANG=en_US.UTF-8
 
 # Preferred editor for local and remote sessions
-if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='vi'
-else
-  export EDITOR='emacs -nw'
-fi
+# if [[ -n $SSH_CONNECTION ]]; then
+#   export EDITOR='vim'
+# else
+#   export EDITOR='nvim'
+# fi
 
 # Compilation flags
-# export ARCHFLAGS="-arch x86_64"
+# export ARCHFLAGS="-arch $(uname -m)"
 
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
+# Set personal aliases, overriding those provided by Oh My Zsh libs,
+# plugins, and themes. Aliases can be placed here, though Oh My Zsh
+# users are encouraged to define aliases within a top-level file in
+# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
+# - $ZSH_CUSTOM/aliases.zsh
+# - $ZSH_CUSTOM/macos.zsh
 # For a full list of active aliases, run `alias`.
 #
 # Example aliases
@@ -138,17 +124,10 @@ fi
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 
-$(brew --prefix asdf)/libexec/asdf.sh
-. /usr/local/opt/asdf/libexec/asdf.sh
+#bindkey "^[[1;5C" forward-word
+#bindkey "^[[1;5D" backward-word
 
-source "$HOME/.cargo/env"
-
-alias ll='exa --long --icons'
-alias ls='exa --icons'
-
-# bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
+alias ll="eza --long --icons"
 
 
-curl "wttr.in/hamburg?1"
+export PATH="$HOME/.cargo/bin:$PATH"
