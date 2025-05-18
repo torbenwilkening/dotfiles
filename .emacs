@@ -1,16 +1,3 @@
-
-
-;; HACK Work around native compilation on macOS failing with 'ld: library not
-;; found for -lemutls_w'.
-;; https://github.com/d12frosted/homebrew-emacs-plus/issues/554
-(setenv "LIBRARY_PATH"
-	(string-join
-	 '("/opt/homebrew/opt/gcc/lib/gcc/14"
-	   "/opt/homebrew/opt/libgccjit/lib/gcc/14"
-	   "/opt/homebrew/opt/gcc/lib/gcc/14/gcc/aarch64-apple-darwin24/14")
-	 ":"))
-
-
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -26,6 +13,19 @@
 
 (setq package-enable-at-startup nil)
 (straight-use-package 'use-package)
+
+
+;; HACK Work around native compilation on macOS failing with 'ld: library not
+;; found for -lemutls_w'.
+;; https://github.com/d12frosted/homebrew-emacs-plus/issues/554
+;;(setenv "LIBRARY_PATH"
+;;	(string-join
+;;	 '("/opt/homebrew/opt/gcc/lib/gcc/14"
+;;	   "/opt/homebrew/opt/libgccjit/lib/gcc/14"
+;;	   "/opt/homebrew/opt/gcc/lib/gcc/14/gcc/aarch64-apple-darwin24/14")
+;;	 ":"))
+
+
 
 
 ;;;;;;;;;;;;;
@@ -109,6 +109,7 @@
 
 (if (display-graphic-p)
     (progn
+      (menu-bar-mode -1)
       (tool-bar-mode -1)
       (scroll-bar-mode -1)))
 (display-battery-mode 1)
