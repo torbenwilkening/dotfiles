@@ -1,0 +1,57 @@
+[{
+    "layer": "top",
+    "modules-left": ["hyprland/window"],
+    "modules-center": ["hyprland/workspaces"],
+    "modules-right": ["network", "battery", "clock"],
+    "hyprland/workspaces": {
+        "format": "{icon}",
+        "format-icons": {
+            "active": "",
+            "default": "",
+            "empty": ""
+        },
+        "persistent-workspaces": {
+            "*": [ 1,2,3,4]
+        }
+    },
+    "hyprland/window": {  
+        "format": "{title}",
+        "maxlength": 50,
+        "rewrite": {
+            "(.*)Mozilla Firefox(.*)": "Firefox",
+            "(.*)Emacs(.*)": "Emacs"
+        }
+    },
+    "network": {
+        "format-wifi": "",
+        "format-ethernet":"",
+        "format-disconnected": "",
+        "tooltip-format-disconnected": "Error",
+        "tooltip-format-wifi": "{essid} ({signalStrength}%) ",
+        "tooltip-format-ethernet": "{ifname} 🖧 ",
+        "on-click": "nm-applet"
+    },
+    "bluetooth": {
+        "format-on": "󰂯",
+        "format-off": "BT-off",
+        "format-disabled": "󰂲",
+        "format-connected-battery": "{device_battery_percentage}% 󰂯",
+        "format-alt": "{device_alias} 󰂯",
+        "tooltip-format": "{controller_alias}\t{controller_address}\n\n{num_connections} connected",
+        "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{num_connections} connected\n\n{device_enumerate}",
+        "tooltip-format-enumerate-connected": "{device_alias}\n{device_address}",
+        "tooltip-format-enumerate-connected-battery": "{device_alias}\n{device_address}\n{device_battery_percentage}%",
+        "on-click-right": "blueman-manager"
+    }, 
+    "battery": {
+        "format": "{capacity}% {icon}",
+        "format-icons": ["", "", "", "", ""]
+    },
+    "clock": {
+        "format-alt": "{:%a, %d. %b  %H:%M}"
+    },
+    "tray": {
+        "icon-size": 14,
+        "spacing": 10
+    }
+}]
