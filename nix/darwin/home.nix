@@ -24,25 +24,26 @@
     htop
     cmake
     imagemagick
-    nerd-fonts.hack
-
+    ffmpeg
+  
     # ui applications
-    # emacs # @todo emacs plus from homebrew for now, it seems bugged
+    # emacs # @todo emacs plus from homebrew for now, it seems bugged with yabai
     alacritty
+    nerd-fonts.hack
 
     # default language tools
     nodejs_22
-    nodePackages.eslint
-    nodePackages.prettier
+    yarn
+    eslint
     nodePackages.vue-language-server
     nodePackages.vls
     nodePackages.typescript-language-server
-    python313
-    python313Packages.requests
-    python313Packages.python-lsp-server
+    python312
+    python312Packages.requests
+    python312Packages.python-lsp-server
     go
     gopls
-    rustup    
+    rustup
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
