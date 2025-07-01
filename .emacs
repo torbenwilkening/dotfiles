@@ -178,7 +178,7 @@
   :hook
   (dired-mode . nerd-icons-dired-mode))
 
-(setq nerd-icons-font-family "Ubuntu Nerd Font")
+(setq nerd-icons-font-family "Hack Nerd Font")
 
 ;; if its lagging during render try this
 ;;(setq inhibit-compacting-font-caches t)

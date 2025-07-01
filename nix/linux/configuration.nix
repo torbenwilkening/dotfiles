@@ -140,7 +140,7 @@
     waybar # top and bottom bar
     waypaper # wallpaper frontend
     swww # wallpaper backend for images
-    mpvpaper # wallpaper backend for videos
+    # mpvpaper # wallpaper backend for videos
     nautilus # gtk file manager
     networkmanagerapplet # gtk network manager frontend
     hyprpolkitagent # for permissions

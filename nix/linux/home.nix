@@ -6,16 +6,29 @@
 
   # Packages that should be installed to the user profile.
   home.packages = with pkgs; [
+    # things with ui
     emacs
     nerd-fonts.hack
+    nerd-fonts.ubuntu
     firefox-wayland
+
+    nil # nix lsp
+
+    # nodejs global things and lsp
+    nodejs_22
+    yarn
+    pnpm
+    eslint
+    vue-language-server
+    typescript
+    typescript-language-server
   ];
 
   # basic configuration of git, please change to your own
   programs.git = {
     enable = true;
     userName = "torbenwilkening";
-    userEmail = "no-replay@github.com";
+    userEmail = "no-reply@github.com";
   };
 
   programs.alacritty = {
