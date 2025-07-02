@@ -143,6 +143,10 @@
 ;;(load-theme 'doom-molokai t)
 (load-theme 'catppuccin t)
 
+(straight-use-package 'nyan-mode)
+(nyan-mode 1)
+(nyan-start-animation)
+
 
 
 ;; treemacs and config

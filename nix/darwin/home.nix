@@ -36,7 +36,7 @@
     yarn
     eslint
     nodePackages.vue-language-server
-    nodePackages.vls
+    # nodePackages.vls
     nodePackages.typescript-language-server
     python312
     python312Packages.requests
