@@ -578,13 +578,12 @@
       kubernetes-redraw-frequency 3600)
 
 ;; ruby
-;; maybe: smartparens-ruby rubocop bundler rbenv ruby-test-mode haml-mode
-(straight-use-package 'enh-ruby-mode)
-(add-hook 'enh-ruby-mode-hook #'eglot-ensure)
+;; maybe try: smartparens-ruby rubocop bundler rbenv ruby-test-mode haml-mode
+;; its time to go back to ruby mode instead of enh-ruby-mode
+(straight-use-package 'ruby-mode)
+(add-hook 'ruby-mode-hook #'eglot-ensure)
 (add-to-list 'auto-mode-alist
-             '("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode))
-;;(add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
-
+             '("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . ruby-mode))
 
 ;; go
 (straight-use-package 'go-mode)
@@ -660,10 +659,6 @@
   (setq typescript-indent-level 2)
   (setq js-jsx-indent-level 2))
 
-;;(straight-use-package 'prettier-js :ensure t)
-;;(add-hook 'web-mode-hook 'prettier-js-mode)
-
-
 ;;;;;;;;;;;;
 ;; vue.js ;;
 ;;;;;;;;;;;;
@@ -736,12 +731,6 @@
 ;;(flycheck-add-mode 'javascript-eslint 'volar-vue-mode)
 (add-to-list 'eglot-server-programs
              `(volar-vue-mode . ("vue-language-server" "--stdio" :initializationOptions ,(volar-eglot-init-options))))
-
-
-;; add some smartparens-mode
-;;(add-hook 'volar-vue-mode-hook #'smartparens-mode)
-;;(add-hook 'vetur-vue-mode-hook #'smartparens-mode)
-
 
 ;; use either vetur (old vue2) or volar (vue3)
 ;; one of these lines
