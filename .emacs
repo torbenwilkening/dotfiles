@@ -690,11 +690,11 @@
 
 
 ;; vue2 with vetur
-(define-derived-mode vetur-vue-mode web-mode "Vue2"
+(define-derived-mode vetur-vue-mode web-mode "Vue"
   "A major mode derived from vue-mode with vetur language server")
 (add-hook 'vetur-vue-mode-hook #'eglot-ensure)
 (add-hook 'vetur-vue-mode-hook 'web-modes-indent-hook)
-(add-to-list 'eglot-server-programs '(vetur-vue-mode "vls"))
+(add-to-list 'eglot-server-programs '(vetur-vue-mode "vue-language-server" "--stdio"))
 ;;(flycheck-add-mode 'javascript-eslint 'vetur-vue-mode)
 
 
