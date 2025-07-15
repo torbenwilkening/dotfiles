@@ -215,7 +215,7 @@
        ;; alert-default-style 'notifier
        alert-default-style 'osx-notifier
        )))
-
+;; (alert "this is an alert")
 
 ;; chatgpt
 ;; (require 'auth-source)
@@ -259,6 +259,32 @@
   (url-insert-file-contents "http://metaphorpsum.com/paragraphs/1"))
 
 
+
+(straight-use-package 'major-mode-hydra)
+;; (major-mode-hydra-define emacs-lisp-mode
+;;   (:title "Actions" :color pink :separator "-")
+;;   ("Eval"
+;;    (("b" eval-buffer "Buffer" :color blue)
+;;     ("r" eval-region "Region" :color red))))
+
+(pretty-hydra-define default-hydra (:title "Actions" :quit-key "q")
+  ("Code"
+   (("c" comment-or-uncomment-region "(Un)Commment Region")
+    ("i" insert-random-text-at-point "Insert Random Text")
+    ("s" yas-insert-snippet "Insert Snippet"))
+   "Git"
+   (("m" magit "Magit")
+    ("g" git-timemachine "Timemachine"))
+   "Eval"
+   (("r" eval-region "Region")
+    ("b" eval-buffer "Buffer"))
+   "Tools"
+   (("t" vterm "Termial"))
+   ))
+)
+(global-set-key (kbd "M-SPC") #'default-hydra/body)
+;; @todo add more major mode hydras and activate this
+;;(global-set-key (kbd "M-SPC") #'major-mode-hydra
     
 
 ;;;;;;;;;;;;;;;;;;
@@ -295,7 +321,7 @@
 ;; delete marked region when typing
 (delete-selection-mode 1)
 
-
+(which-key-mode t)
 
 (use-package consult
   :straight t
@@ -665,22 +691,6 @@
 ;; for vetur
 ;;npm install vls -g
 
-;; if flymake should do the lint and not eglot
-;; (straight-use-package 'flymake-eslint)
-;; (add-hook 'web-mode-hook ; or whatever the mode-hook is for your mode of choice
-;;   (lambda ()
-;;     (flymake-eslint-enable)))
-;; (setq eglot-stay-out-of '(flymake))
-;; (add-hook 'eglot--managed-mode-hook (lambda () (add-hook 'flymake-diagnostic-functions 'eglot-flymake-backend nil t)))
-
-;; vue3 with volar
-(straight-use-package 'vue-mode)
-(add-hook 'vue-mode-hook #'eglot-ensure)
-(add-hook 'vue-mode-hook
-          (lambda ()
-            (set-face-background 'mmm-default-submode-face nil)))
-
-
 ;; vue2 with vetur
 (define-derived-mode vetur-vue-mode web-mode "Vue2"
   "A major mode derived from vue-mode with vetur language server")
@@ -688,10 +698,10 @@
 (add-hook 'vetur-vue-mode-hook 'web-modes-indent-hook)
 ;; vetur still works better for vue2
 (add-to-list 'eglot-server-programs '(vetur-vue-mode "vls" "--stdio"))
+;; or try volar
 ;; for volar: (add-to-list 'eglot-server-programs '(vetur-vue-mode "vue-language-server" "--stdio"))
 
 (add-to-list 'auto-mode-alist '("\\.vue\\'" . vetur-vue-mode))
-;;(add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode))
 
 
 ;; scala
