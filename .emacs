@@ -77,10 +77,10 @@
 (add-to-list 'image-types 'svg)
 
 ;; env variables (before emacs 29)
-;;(straight-use-package 'exec-path-from-shell)
-;;(when (memq window-system '(mac ns x))
-;;  (exec-path-from-shell-initialize))
-;;(exec-path-from-shell-copy-env "PATH")
+(straight-use-package 'exec-path-from-shell)
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize))
+(exec-path-from-shell-copy-env "PATH")
 
 ;; setup world clocks
 (setq world-clock-list
@@ -436,13 +436,6 @@
   (setq vertico-cycle t)
   )
 
-;; (straight-use-package 'mini-frame)
-;; (custom-set-variables
-;;  '(mini-frame-show-parameters
-;;    '((top . 80)
-;;      (width . 0.7)
-;;      (left . 0.5))))
-;; (mini-frame-mode 1)
 
 (use-package marginalia
   :straight t
@@ -536,15 +529,6 @@
 ;;;;;;;;;;;;;;;;;
 
 
-;; nix
-(straight-use-package 'nix-mode)
-(use-package eglot
-  :config
-  ;; Ensure `nil` is in your PATH.
-  (add-to-list 'eglot-server-programs '(nix-mode . ("nil")))
-  :hook
-  (nix-mode . eglot-ensure))
-(add-to-list 'auto-mode-alist '("\\.nix\\'" . nix-mode))
 
 ;; tree-sitter until emacs 29
 (straight-use-package 'tree-sitter)
@@ -577,6 +561,12 @@
 (setq kubernetes-poll-frequency 3600
       kubernetes-redraw-frequency 3600)
 
+;; nix
+(straight-use-package 'nix-mode)
+(add-hook 'nix-mode #'eglot-ensure)
+(add-to-list 'eglot-server-programs '(nix-mode . ("nil")))
+(add-to-list 'auto-mode-alist '("\\.nix\\'" . nix-mode))
+
 ;; ruby
 ;; maybe try: smartparens-ruby rubocop bundler rbenv ruby-test-mode haml-mode
 ;; its time to go back to ruby mode instead of enh-ruby-mode
@@ -605,6 +595,7 @@
 (straight-use-package 'markdown-mode) ; brew install marksman
 (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman")))
 (add-hook 'markdown-mode-hook #'eglot-ensure)
+(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 
 ;; mermaid
 (straight-use-package 'mermaid-mode)
@@ -614,28 +605,19 @@
 (add-hook 'rust-mode-hook 'eglot-ensure)
 
 
-;; web development
-;; @todo make eslint relative to the project, not global
-;; @todo disable flymake in favor of flycheck
-
 ;; html / css
 ;; run: npm i -g vscode-langservers-extracted
 
 ;; web-mode
 (straight-use-package 'web-mode)
+(straight-use-package 'css-mode)
+(straight-use-package 'scss-mode)
 (add-hook 'web-mode-hook #'eglot-ensure)
+(add-hook 'css-mode-hook #'eglot-ensure)
+(add-hook 'scss-mode-hook #'eglot-ensure)
 (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.css\\'" . css-mode))
 (add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
-
-;; css-mode / scss-mode
-(defun css-mode-indent-hook ()
-  "Indentation for SCSS/CSS"
-  (setq css-indent-offset 2))
-(add-hook 'css-mode-hook 'css-mode-indent-hook)
-(add-hook 'css-mode-hook #'eglot-ensure)
-(add-hook 'scss-mode-hook 'css-mode-indent-hook)
-(add-hook 'scss-mode-hook #'eglot-ensure)
 
 ;; typescript / javascript
 (straight-use-package 'typescript-mode)
@@ -643,21 +625,35 @@
 (add-hook 'typescript-mode-hook #'eglot-ensure)
 (add-hook 'typescript-mode-hook 'flycheck-mode)
 (add-to-list 'eglot-server-programs '(typescript-mode . ("typescript-language-server" "--stdio")))
-;;(add-to-list 'eglot-server-programs '(typescript-mode . ("typescript-language-server" "--stdio")))
-;;(flycheck-add-mode 'javascript-eslint 'typescript-mode)
 (straight-use-package 'prettier-js)
-
 (add-to-list 'auto-mode-alist '("\\.js\\'" . typescript-mode))
 (add-to-list 'auto-mode-alist '("\\.mjs\\'" . typescript-mode))
 (add-to-list 'auto-mode-alist '("\\.jsx\\'" . typescript-mode))
 (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
 
+
+;; hooks for web-mode / css-mode / js-mode indent
+(defun css-mode-indent-hook ()
+  "Indentation for SCSS/CSS"
+  (setq css-indent-offset 2))
+(add-hook 'css-mode-hook 'css-mode-indent-hook)
+(add-hook 'scss-mode-hook 'css-mode-indent-hook)
+
 (defun js-modes-indent-hook ()
   "Indent settings for js-mode, js2-mode and typescript mode"
   (setq js-indent-level 2)
   (setq typescript-indent-level 2)
   (setq js-jsx-indent-level 2))
+
+(defun web-modes-indent-hook ()
+  "Indent settings for web-mode"
+  (setq web-mode-script-padding 0)
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
+  (setq web-mode-style-padding 0)
+  (setq web-mode-code-indent-offset 2))
+(add-hook 'web-mode-hook  'web-modes-indent-hook)
 
 ;;;;;;;;;;;;
 ;; vue.js ;;
@@ -669,73 +665,65 @@
 ;; for vetur
 ;;npm install vls -g
 
+;; if flymake should do the lint and not eglot
+;; (straight-use-package 'flymake-eslint)
+;; (add-hook 'web-mode-hook ; or whatever the mode-hook is for your mode of choice
+;;   (lambda ()
+;;     (flymake-eslint-enable)))
+;; (setq eglot-stay-out-of '(flymake))
+;; (add-hook 'eglot--managed-mode-hook (lambda () (add-hook 'flymake-diagnostic-functions 'eglot-flymake-backend nil t)))
 
-(defun web-modes-indent-hook ()
-  "Indent settings for web-mode"
-  (setq web-mode-script-padding 0)
-  (setq web-mode-markup-indent-offset 2)
-  (setq web-mode-css-indent-offset 2)
-  (setq web-mode-style-padding 0)
-  (setq web-mode-code-indent-offset 2))
-
-(add-hook 'web-mode-hook  'web-modes-indent-hook)
-
-;; add flymake and let eglot stay out of it
-(straight-use-package 'flymake-eslint)
-(add-hook 'web-mode-hook ; or whatever the mode-hook is for your mode of choice
-  (lambda ()
-    (flymake-eslint-enable)))
-(setq eglot-stay-out-of '(flymake))
-(add-hook 'eglot--managed-mode-hook (lambda () (add-hook 'flymake-diagnostic-functions 'eglot-flymake-backend nil t)))
+;; vue3 with volar
+(straight-use-package 'vue-mode)
+(add-hook 'vue-mode-hook #'eglot-ensure)
+(add-hook 'vue-mode-hook
+          (lambda ()
+            (set-face-background 'mmm-default-submode-face nil)))
 
 
 ;; vue2 with vetur
-(define-derived-mode vetur-vue-mode web-mode "Vue"
+(define-derived-mode vetur-vue-mode web-mode "Vue2"
   "A major mode derived from vue-mode with vetur language server")
 (add-hook 'vetur-vue-mode-hook #'eglot-ensure)
 (add-hook 'vetur-vue-mode-hook 'web-modes-indent-hook)
-(add-to-list 'eglot-server-programs '(vetur-vue-mode "vue-language-server" "--stdio"))
-;;(flycheck-add-mode 'javascript-eslint 'vetur-vue-mode)
+;; vetur still works better for vue2
+(add-to-list 'eglot-server-programs '(vetur-vue-mode "vls" "--stdio"))
+;; for volar: (add-to-list 'eglot-server-programs '(vetur-vue-mode "vue-language-server" "--stdio"))
 
-
-
-;; vue3 with volar (works!!)
-(defun volar-custom-hooks ()
-  (flycheck-mode t)
-  (eglot-ensure))
-(defun volar-eglot-init-options ()
-  (let ((tsdk-path (expand-file-name
-                    "lib"
-                    (string-trim-right (shell-command-to-string "npm list --global --parseable typescript | head -n1"))
-                    )))
-    `(:typescript (:tsdk ,tsdk-path
-                         :languageFeatures (:completion
-                                            (:defaultTagNameCase "both"
-                                                                 :defaultAttrNameCase "kebabCase"
-                                                                 :getDocumentNameCasesRequest t
-                                                                 :getDocumentSelectionRequest t)
-                                            :diagnostics
-                                            (:getDocumentVersionRequest t))
-                         :documentFeatures (:documentFormatting
-                                            (:defaultPrintWidth 100
-                                                                :getDocumentPrintWidthRequest t)
-                                            :documentSymbol t
-                                            :documentColor t)
-                         ))))
-(define-derived-mode volar-vue-mode web-mode "Vue3"
-   "A major mode derived from vue-mode with volar language server")
-(add-hook 'volar-vue-mode-hook 'web-modes-indent-hook)
-(add-hook 'volar-vue-mode-hook 'volar-custom-hooks)
-;; (add-to-list 'eglot-server-programs '(volar-vue-mode "vue-language-server" "--stdio"))
-;;(add-to-list 'eglot-server-programs '(volar-vue-mode "vue-language-server" "--stdio"))
-;;(flycheck-add-mode 'javascript-eslint 'volar-vue-mode)
-(add-to-list 'eglot-server-programs
-             `(volar-vue-mode . ("vue-language-server" "--stdio" :initializationOptions ,(volar-eglot-init-options))))
-
-;; use either vetur (old vue2) or volar (vue3)
-;; one of these lines
 (add-to-list 'auto-mode-alist '("\\.vue\\'" . vetur-vue-mode))
-;;(add-to-list 'auto-mode-alist '("\\.vue\\'" . volar-vue-mode))
+;;(add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode))
+
+
+;; scala
+(use-package scala-mode
+  :straight t
+  :interpreter ("scala" . scala-mode))
+;; Enable sbt mode for executing sbt commands
+(use-package sbt-mode
+  :straight t
+  :commands sbt-start sbt-command
+  :config
+  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+  ;; allows using SPACE when in the minibuffer
+  (substitute-key-definition
+   'minibuffer-complete-word
+   'self-insert-command
+   minibuffer-local-completion-map)
+   ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
+   (setq sbt:program-options '("-Dsbt.supershell=false")))
+
+(add-hook 'scala-mode-hook #'eglot-ensure)
+
+(add-to-list 'auto-mode-alist '("\\.s\\(cala\\|bt\\)$" . scala-mode))
+;; install metals with coursier
+;; coursier bootstrap \
+;;  --java-opt -Xss4m \
+;;  --java-opt -Xms100m \
+;;  --java-opt -Dmetals.client=emacs \
+;;  org.scalameta:metals_2.13:1.3.4 \
+;;  -r bintray:scalacenter/releases \
+;;  -r sonatype:snapshots \
+;;  -o /usr/local/bin/metals-emacs -f
 
 
 
@@ -820,36 +808,4 @@
 ;;(global-set-key (kbd "<f1> o") 'counsel-describe-symbol)
 ;;(global-set-key (kbd "<f1> l") 'counsel-find-library)
 
-
-;; scala
-(use-package scala-mode
-  :straight t
-  :interpreter ("scala" . scala-mode))
-
-;; Enable sbt mode for executing sbt commands
-(use-package sbt-mode
-  :straight t
-  :commands sbt-start sbt-command
-  :config
-  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
-  ;; allows using SPACE when in the minibuffer
-  (substitute-key-definition
-   'minibuffer-complete-word
-   'self-insert-command
-   minibuffer-local-completion-map)
-   ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
-   (setq sbt:program-options '("-Dsbt.supershell=false")))
-
-(add-hook 'scala-mode-hook #'eglot-ensure)
-
-(add-to-list 'auto-mode-alist '("\\.s\\(cala\\|bt\\)$" . scala-mode))
-
-;; coursier bootstrap \
-;;  --java-opt -Xss4m \
-;;  --java-opt -Xms100m \
-;;  --java-opt -Dmetals.client=emacs \
-;;  org.scalameta:metals_2.13:1.3.4 \
-;;  -r bintray:scalacenter/releases \
-;;  -r sonatype:snapshots \
-;;  -o /usr/local/bin/metals-emacs -f
 
