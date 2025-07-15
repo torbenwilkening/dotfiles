@@ -26,8 +26,6 @@
 ;;	 ":"))
 
 
-
-
 ;;;;;;;;;;;;;
 ;; welcome ;;
 ;;;;;;;;;;;;;
@@ -279,9 +277,8 @@
    (("r" eval-region "Region")
     ("b" eval-buffer "Buffer"))
    "Tools"
-   (("t" vterm "Termial"))
-   ))
-)
+   (("t" vterm "Termial"))))
+
 (global-set-key (kbd "M-SPC") #'default-hydra/body)
 ;; @todo add more major mode hydras and activate this
 ;;(global-set-key (kbd "M-SPC") #'major-mode-hydra
