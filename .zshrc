@@ -19,8 +19,9 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
-ll="eza --icons -l"
-la="eza --icons -la"
+alias ls="eza --icons"
+alias ll="eza --icons -l"
+alias la="eza --icons -la"
 
 # with darwin
 #update="/run/current-system/sw/bin/darwin-rebuild switch"
