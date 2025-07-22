@@ -2,7 +2,7 @@
     "layer": "top",
     "modules-left": ["hyprland/window"],
     "modules-center": ["hyprland/workspaces"],
-    "modules-right": ["network", "battery", "clock"],
+    "modules-right": ["tray", "backlight/slider", "battery", "clock", "custom/syspower"],
     "hyprland/workspaces": {
         "format": "{icon}",
         "format-icons": {
@@ -51,7 +51,28 @@
         "format-alt": "{:%a, %d. %b  %H:%M}"
     },
     "tray": {
-        "icon-size": 14,
+        "icon-size": 18,
         "spacing": 10
+    },
+    "backlight/slider": {
+        "min": 20,
+        "max": 100,
+        "orientation": "horizontal"
+    },
+    "wireplumber": {
+        "format": "{volume}%",
+        "format-muted": "Mute",
+        "on-click": "wpctl set-mute @DEFAULT_SINK@ toggle",
+        "format-icons": ["", "", ""]
+    },
+    "user": {
+        "format": "{user}",
+        "interval": 60,
+        "on-click": "syspower",
+        "icon": true
+    },
+    "custom/syspower": {
+        "format": "Power",
+        "on-click": "syspower"
     }
 }]

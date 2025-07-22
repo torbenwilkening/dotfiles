@@ -136,3 +136,35 @@ blue #89b4fa
   padding: 0px 8px;
   transition: all .3s ease; 
 }
+
+#backlight-slider slider {
+    min-height: 0px;
+    min-width: 0px;
+    opacity: 0;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+}
+#backlight-slider trough {
+    min-height: 8px;
+    min-width: 40px;
+    border-radius: 5px;
+    background: none;
+}
+#backlight-slider highlight {
+    min-width: 4px;
+    border-radius: 4px;
+    background-color: white;
+}
+
+#wireplumber {
+  min-width: 40px;
+  min-height: 8px;
+  background: none;
+  color: #fff;
+
+}
+#wireplumber.muted {
+  color: #fff;
+}
+

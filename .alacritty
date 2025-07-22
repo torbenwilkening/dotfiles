@@ -1,0 +1,22 @@
+[window]
+decorations = "transparent"
+title = "Its me your Terminal"
+option_as_alt = "Both"
+
+padding.x = 6
+padding.y = 0
+
+[colors.primary]
+background = "#282a36"
+foreground = "#f8f8f2"
+
+[keyboard]
+# finally this is the fix for ctrl+arrow keys
+bindings = [
+  { key = "Left",  mods = "Control",     chars = "\u001bB"   },
+  { key = "Right", mods = "Control",     chars = "\u001bF"   },
+#  { key = "Left",  mods = "Command", chars = "\u001bOH"  },
+#  { key = "Right", mods = "Command", chars =  "\u001bOF" },
+  { key = "n", mods = "Alt", chars =  "~" },
+  { key = "l", mods = "Alt", chars =  "@" },
+]

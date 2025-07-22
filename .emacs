@@ -107,7 +107,7 @@
 
 (if (display-graphic-p)
     (progn
-      (menu-bar-mode t)
+      (menu-bar-mode -1)
       (tool-bar-mode -1)
       (scroll-bar-mode -1)))
 (display-battery-mode 1)
@@ -127,10 +127,11 @@
 ;(setq all-the-icons-dired-monochrome t)
 
 ;; general theme
-;;(straight-use-package 'doom-themes)
+(straight-use-package 'doom-themes)
 ;;(with-eval-after-load 'doom-themes
 ;;  (doom-themes-treemacs-config))
-(straight-use-package 'catppuccin-theme)
+;;(straight-use-package 'catppuccin-theme)
+;;(straight-use-package 'dracula-theme)
 
 ;; great themes:
 ;;
@@ -139,7 +140,9 @@
 ;;(load-theme 'doom-nord t)
 ;;(load-theme 'doom-opera t)
 ;;(load-theme 'doom-molokai t)
-(load-theme 'catppuccin t)
+;;(load-theme 'catppuccin t)
+;;(load-theme 'dracula t)
+(load-theme 'doom-dracula t)
 
 (straight-use-package 'nyan-mode)
 (nyan-mode 1)
@@ -268,14 +271,15 @@
 (pretty-hydra-define default-hydra (:title "Actions" :quit-key "q")
   ("Code"
    (("c" comment-or-uncomment-region "(Un)Commment Region")
+    ("r" replace-string "Replace String")
     ("i" insert-random-text-at-point "Insert Random Text")
     ("s" yas-insert-snippet "Insert Snippet"))
    "Git"
    (("m" magit "Magit")
     ("g" git-timemachine "Timemachine"))
    "Eval"
-   (("r" eval-region "Region")
-    ("b" eval-buffer "Buffer"))
+   (("R" eval-region "Region")
+    ("B" eval-buffer "Buffer"))
    "Tools"
    (("t" vterm "Termial"))))
 
@@ -522,8 +526,8 @@
 ;; eglot
 (straight-use-package 'project)
 (require 'project)
-(global-set-key (kbd "s-f") 'project-find-file)
-(global-set-key (kbd "s-s") 'project-switch-project)
+(global-set-key (kbd "M-f") 'project-find-file)
+(global-set-key (kbd "M-s") 'project-switch-project)
 
 
 (straight-use-package 'eglot)
@@ -742,16 +746,18 @@
 
 
 ;; window movement
-;; use s+<arrow>
-(define-key global-map (kbd "s-<up>") 'windmove-up)
-(define-key global-map (kbd "s-<down>") 'windmove-down)
-(define-key global-map (kbd "s-<left>") 'windmove-left)
-(define-key global-map (kbd "s-<right>") 'windmove-right)
+;; use M+<arrow>
+(define-key global-map (kbd "M-<up>") 'windmove-up)
+(define-key global-map (kbd "M-<down>") 'windmove-down)
+(define-key global-map (kbd "M-<left>") 'windmove-left)
+(define-key global-map (kbd "M-<right>") 'windmove-right)
 ;; window splitting
 (global-set-key (kbd "C-3") 'split-window-horizontally)
 (global-set-key (kbd "C-2") 'split-window-vertically)
 (global-set-key (kbd "C-1") 'delete-other-windows)
 (global-set-key (kbd "C-0") 'delete-window)
+(global-set-key (kbd "M-o") 'other-window)
+(global-set-key (kbd "M-b") 'ibuffer)
 
 ;; buffer movement
 ;; ibuffer usually with b
@@ -761,10 +767,10 @@
 ;;(global-set-key (kbd "C-b") 'counsel-switch-buffer)  ;'switch-to-buffer)
 ;; default m+k for kill current buffer
 
-(global-set-key (kbd "s-p") 'previous-buffer)
-(global-set-key (kbd "s-n") 'next-buffer)
-(global-set-key (kbd "s-k") 'kill-current-buffer)
-(global-set-key (kbd "s-e") 'treemacs)
+(global-set-key (kbd "M-p") 'previous-buffer)
+(global-set-key (kbd "M-n") 'next-buffer)
+;;(global-set-key (kbd "s-k") 'kill-current-buffer)
+(global-set-key (kbd "M-e") 'treemacs)
 ;;(global-set-key (kbd "C-S-s") 'ag-project)
 
 ;; replaces i-search with swiper
@@ -781,14 +787,14 @@
 
 ;;(global-set-key (kbd "M-l") 'goto-line)
 ;; use M+<arrow> for multiple lines
-(global-set-key (kbd "M-<down>")
-                (lambda () (interactive) (forward-line  8)))
-(global-set-key (kbd "M-<up>")
-                (lambda () (interactive) (forward-line -8)))
-(global-set-key (kbd "C-n")
-                (lambda () (interactive) (forward-line  24)))
-(global-set-key (kbd "C-p")
-                (lambda () (interactive) (forward-line -24)))
+;; (global-set-key (kbd "M-<down>")
+;;                 (lambda () (interactive) (forward-line  10)))
+;; (global-set-key (kbd "M-<up>")
+;;                 (lambda () (interactive) (forward-line -10)))
+;; (global-set-key (kbd "C-n")
+;;                 (lambda () (interactive) (forward-line  24)))
+;; (global-set-key (kbd "C-p")
+;;                 (lambda () (interactive) (forward-line -24)))
 
 ;; code modification
 (global-set-key (kbd "C-u") 'undo)
@@ -798,7 +804,7 @@
 ;; eglot
 (global-set-key (kbd "<C-return>") 'xref-find-definitions)
 (global-set-key (kbd "<M-return>") 'xref-find-references)
-(global-set-key (kbd "<s-return>") 'eglot-code-actions)
+;;(global-set-key (kbd "<s-return>") 'eglot-code-actions)
 
 ;; searching
 
@@ -816,3 +822,17 @@
 ;;(global-set-key (kbd "<f1> l") 'counsel-find-library)
 
 
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("8c7e832be864674c220f9a9361c851917a93f921fedb7717b1b5ece47690c098"
+     default)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
