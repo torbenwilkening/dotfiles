@@ -17,16 +17,10 @@
       src = ./firmware/brcm;
       # dontUnpack = true;
       installPhase = ''
-	mkdir -p $out/lib/firmware/brcm
-	cp "${final.src}"/* "$out/lib/firmware/brcm"
+      	mkdir -p $out/lib/firmware/brcm
+        	cp "${final.src}"/* "$out/lib/firmware/brcm"
       '';
     }))
-
-#    (pkgs.runCommand "brcm-firmware" { } ''
-#	mkdir -p $out/lib/firmware/
-#	cp -r  ${./firmware/brcm} "$out"/lib/firmware/
-#    '')
-
   ];
 
  # imports =
@@ -80,18 +74,26 @@
     pulse.enable = true;
   };
 
+  programs.nh = {
+    enable = true;
+    clean.enable = true;
+    clean.extraArgs = "--keep-since 4d --keep 3";
+    flake = "/home/torben/Projects/dotfiles"; # sets NH_OS_FLAKE variable for you
+  };
+  
   # Enable touchpad support (enabled default in most desktopManager).
   services.libinput.enable = true;
 
   programs.regreet = {
     enable = true;
-    # default config : https://github.com/rharish101/ReGreet/blob/main/regreet.sample.toml
+    # default config:
+    # https://github.com/rharish101/ReGreet/blob/main/regreet.sample.toml
     settings = {
       default_session = {
         command = "Hyperland";
       };
       background = {
-        path = "/etc/background.png";
+        path = "/etc/background.png"; # make sure it exists
         fit = "Fill";
       };
       widget.clock = {
@@ -102,6 +104,12 @@
         GTK_USE_PORTAL = "0";
         GDK_DEBUG = "no-portals";
       };
+      gtk = {
+        theme_name = "Dracula";
+        font_name = "Hack 16";
+        icon_theme_name = "Papirus-Dark";
+        cursor_theme_name = "Bibata-Modern-Ice";
+      };
     };
   };
 
@@ -110,8 +118,6 @@
     isNormalUser = true;
     extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
     shell = pkgs.zsh;
-    packages = with pkgs; [
-    ];
   };
 
   fonts.packages = with pkgs; [
@@ -126,7 +132,8 @@
   # You can use https://search.nixos.org/ to find more packages (and options).
   environment.systemPackages = with pkgs; [
     # default tools
-    emacs # Do not forget to add an editor to edit configuration.nix!
+    emacs # do not forget to add an editor to edit configuration.nix!
+    nil # nix LSP server
     git
     wget
     curl
@@ -143,17 +150,14 @@
     gnumake
     libtool
 
-    # gui tools
+    # default gui tools
     alacritty
-    brave
     firefox-devedition
-    # kdePackages.dolphin # file manager @todo theme
     nautilus
     nwg-look
     dracula-theme
     bibata-cursors
     papirus-icon-theme
-    papirus-folders
     
     # hyprland tools
     waybar # @todo theme
@@ -171,29 +175,12 @@
     
   ];
   
-  # gtk = {
-  #   enable = true;
-  #   theme = {
-  #     name = "Dracula";
-  #     package = pkgs.dracula-theme;
-  #   };
-  #   iconTheme = {
-  #     name = "Papirus";
-  #     package = pkgs.papirus-icon-theme;
-  #   };
-  #   gtk3 = {
-  #     extraConfig.gtk-application-prefer-dark-theme = true;
-  #   };
-    
-  # };
+  programs.hyprland = {
+    enable = true;
+    xwayland.enable = true;
+  };
   
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
+  programs.dconf.enable = true;
 
   programs.zsh = {
     enable = true;
@@ -202,17 +189,8 @@
     zsh-autoenv.enable = true;
 
     shellAliases = {
-      #ll = "eza --icons -l";
-      #la = "eza --icons -la";
-      #l = "eza --icons";
       nix-update = "nixos-rebuild switch --flake /etc/nixos --sudo";
     }; 
-  };
-
-  # GUI
-  programs.hyprland = {
-    enable = true;
-    xwayland.enable = true;
   };
 
   # List services that you want to enable:
