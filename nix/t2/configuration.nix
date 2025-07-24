@@ -20,13 +20,7 @@
       	mkdir -p $out/lib/firmware/brcm
         	cp "${final.src}"/* "$out/lib/firmware/brcm"
       '';
-    }))
-  ];
-
- # imports =
- #   [
- #     ./hardware-configuration.nix
- #   ];
+    }))  ];
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
@@ -39,7 +33,7 @@
   networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
 
   # Set your time zone.
-  time.timeZone = "Europe/Amsterdam";
+  time.timeZone = "Europe/Berlin";
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
@@ -53,22 +47,10 @@
   #   useXkbConfig = true; # use xkb.options in tty.
   # };
 
-  # Enable the X11 windowing system.
-  # services.xserver.enable = true;
-
-
-  
-
-  # Configure keymap in X11
-  # services.xserver.xkb.layout = "us";
-  # services.xserver.xkb.options = "eurosign:e,caps:escape";
-
   # Enable CUPS to print documents.
   # services.printing.enable = true;
 
   # Enable sound.
-  # services.pulseaudio.enable = true;
-  # OR
   services.pipewire = {
     enable = true;
     pulse.enable = true;
@@ -78,7 +60,7 @@
     enable = true;
     clean.enable = true;
     clean.extraArgs = "--keep-since 4d --keep 3";
-    flake = "/home/torben/Projects/dotfiles"; # sets NH_OS_FLAKE variable for you
+    flake = "/home/torben/Projects/dotfiles/nix/t2"; # sets NH_OS_FLAKE variable for you
   };
   
   # Enable touchpad support (enabled default in most desktopManager).
@@ -88,7 +70,7 @@
     enable = true;
     # default config:
     # https://github.com/rharish101/ReGreet/blob/main/regreet.sample.toml
-    settings = {
+    settings = lib.mkForce {
       default_session = {
         command = "Hyperland";
       };
@@ -104,7 +86,7 @@
         GTK_USE_PORTAL = "0";
         GDK_DEBUG = "no-portals";
       };
-      gtk = {
+      GTK = {
         theme_name = "Dracula";
         font_name = "Hack 16";
         icon_theme_name = "Papirus-Dark";
@@ -165,13 +147,13 @@
     hyprpaper
     mako # notifications @todo theme
     libnotify
-    syshud # osd @todo theme
-    syspower # power menu @todo theme
+    syspower # power menu, @todo use wleave
     networkmanagerapplet # network ui
     hyprpolkitagent # permissions
-    anyrun # launcher @todo theme
+    anyrun # launcher
     hypridle # idle
-    hyprlock # @todo theme
+    hyprlock # lockscreen
+    udiskie # auto mount
     
   ];
   
@@ -193,10 +175,21 @@
     }; 
   };
 
-  # List services that you want to enable:
+  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+    "steam"
+    "steam-original"
+    "steam-unwrapped"
+    "steam-run"
+  ];
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
+    dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
+    localNetworkGameTransfers.openFirewall = true; # Open ports in the firewall for Steam Local Network Game Transfers
+  };
 
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
+  
+  # List services that you want to enable:
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];

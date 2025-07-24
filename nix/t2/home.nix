@@ -3,11 +3,8 @@
 {
   home.username = "torben";
   home.homeDirectory = "/home/torben";
+  home.packages = with pkgs; [];
 
-  home.packages = with pkgs; [
-
-  ];
-  
   gtk = {
     enable = true;
     theme = {
