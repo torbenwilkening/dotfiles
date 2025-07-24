@@ -2,13 +2,15 @@
 decorations = "transparent"
 title = "Its me your Terminal"
 option_as_alt = "Both"
-
 padding.x = 6
 padding.y = 0
 
 [colors.primary]
 background = "#282a36"
 foreground = "#f8f8f2"
+
+[font]
+size = 10
 
 [keyboard]
 # finally this is the fix for ctrl+arrow keys
