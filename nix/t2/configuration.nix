@@ -93,6 +93,12 @@
         cursor_theme_name = "Bibata-Modern-Ice";
       };
     };
+    extraCss = ".destructive-action { background: none; border: none; }";
+    cursorTheme = {
+      name = "Bibata-Modern-Ice";
+      package = pkgs.bibata-cursors;
+    };
+    
   };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
@@ -125,6 +131,7 @@
     htop
     gnupg
     unzip
+    fzf
 
     # compiling
     cmake
@@ -145,14 +152,14 @@
     waybar # @todo theme
     waypaper
     hyprpaper
-    mako # notifications @todo theme
+    mako # notifications
     libnotify
-    syspower # power menu, @todo use wleave
     networkmanagerapplet # network ui
     hyprpolkitagent # permissions
     anyrun # launcher
     hypridle # idle
     hyprlock # lockscreen
+    wleave # logout menu
     udiskie # auto mount
     
   ];
