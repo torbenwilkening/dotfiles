@@ -4,7 +4,7 @@
         "reload_on_style_change": true,
         "modules-left": ["hyprland/window"],
         "modules-center": ["hyprland/workspaces"],
-        "modules-right": ["tray", "battery", "group/backlight", "wireplumber", "clock"],
+        "modules-right": ["tray", "battery", "group/backlight", "wireplumber", "clock", "custom/power"],
         
         "hyprland/workspaces": {
             "format": "{icon}",
@@ -97,9 +97,9 @@
             "on-click": "syspower",
             "icon": true
         },
-        "custom/syspower": {
-            "format": "Power",
-            "on-click": "syspower"
+        "custom/power": {
+            "format": "⏻",
+            "on-click": "wleave"
         }
     }
 
