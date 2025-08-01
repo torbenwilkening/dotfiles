@@ -1,78 +1,106 @@
-[{
-    "layer": "top",
-    "modules-left": ["hyprland/window"],
-    "modules-center": ["hyprland/workspaces"],
-    "modules-right": ["tray", "backlight/slider", "battery", "clock", "custom/syspower"],
-    "hyprland/workspaces": {
-        "format": "{icon}",
-        "format-icons": {
-            "active": "",
-            "default": "",
-            "empty": ""
+[
+    {
+        "layer": "top",
+        "reload_on_style_change": true,
+        "modules-left": ["hyprland/window"],
+        "modules-center": ["hyprland/workspaces"],
+        "modules-right": ["tray", "battery", "group/backlight", "wireplumber", "clock"],
+        
+        "hyprland/workspaces": {
+            "format": "{icon}",
+            "format-icons": {
+                "active": "",
+                "default": "",
+                "empty": ""
+            },
+            "persistent-workspaces": {
+                "*": [ 1,2,3,4]
+            }
         },
-        "persistent-workspaces": {
-            "*": [ 1,2,3,4]
+        "hyprland/window": {  
+            "format": "{title}",
+            "maxlength": 50,
+            "rewrite": {
+                "(.*)Firefox(.*)": "Firefox",
+                "(.*)Emacs(.*)": "Emacs"
+            }
+        },
+
+        "backlight": {
+            "rotate": 0,
+            "format": "{icon}",
+            "format-icons": ["󰃞", "󰃝", "󰃟", "󰃠"],
+            "scroll-step": 1,
+            "min-length": 2
+        },
+        "backlight/slider": {
+            "min": 10,
+            "max": 100,
+            "rotate": 0,
+            "scroll-step": 1,
+        },
+        "group/backlight": {
+            "orientation": "horizontal",
+            "drawer": {
+                "transition-duration": 600,
+                "children-class": "not-power",
+                "transition-to-left": true,
+                "click-to-reveal": true
+            },
+            "modules": ["backlight","backlight/slider"]
+        },
+        
+        "bluetooth": {
+            "format-on": "󰂯",
+            "format-off": "BT-off",
+            "format-disabled": "󰂲",
+            "format-connected-battery": "{device_battery_percentage}% 󰂯",
+            "format-alt": "{device_alias} 󰂯",
+            "tooltip-format": "{controller_alias}\t{controller_address}\n\n{num_connections} connected",
+            "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{num_connections} connected\n\n{device_enumerate}",
+            "tooltip-format-enumerate-connected": "{device_alias}\n{device_address}",
+            "tooltip-format-enumerate-connected-battery": "{device_alias}\n{device_address}\n{device_battery_percentage}%",
+            "on-click-right": "blueman-manager"
+        }, 
+        "battery": {
+            "format": "{capacity}% {icon}",
+            "format-icons": ["", "", "", "", ""]
+        },
+        "clock": {
+            "format": "{:%H:%M}",
+            "tooltip-format": "<tt>{calendar}</tt>",
+            "calendar": {
+                "mode": "month",
+                "mode-mon-col": 3,
+                "on-scroll": 1,
+                "on-click-right": "mode",
+                "format": {
+                    "months": "<span color='#ffead3'><b>{}</b></span>",
+                    "weekdays": "<span color='#ffcc66'><b>{}</b></span>",
+                    "today": "<span color='#ff6699'><b>{}</b></span>"
+                }
+            },
+        },
+        "tray": {
+            "icon-size": 18,
+            "spacing": 10
+        },
+        "wireplumber": {
+            "format": "{icon}",
+            "format-muted": "",
+            "on-click": "wpctl set-mute @DEFAULT_SINK@ toggle",
+            "format-icons": ["", "", ""]
+        },
+        "user": {
+            "format": "{user}",
+            "interval": 60,
+            "on-click": "syspower",
+            "icon": true
+        },
+        "custom/syspower": {
+            "format": "Power",
+            "on-click": "syspower"
         }
-    },
-    "hyprland/window": {  
-        "format": "{title}",
-        "maxlength": 50,
-        "rewrite": {
-            "(.*)Mozilla Firefox(.*)": "Firefox",
-            "(.*)Emacs(.*)": "Emacs"
-        }
-    },
-    "network": {
-        "format-wifi": "",
-        "format-ethernet":"",
-        "format-disconnected": "",
-        "tooltip-format-disconnected": "Error",
-        "tooltip-format-wifi": "{essid} ({signalStrength}%) ",
-        "tooltip-format-ethernet": "{ifname} 🖧 ",
-        "on-click": "nm-applet"
-    },
-    "bluetooth": {
-        "format-on": "󰂯",
-        "format-off": "BT-off",
-        "format-disabled": "󰂲",
-        "format-connected-battery": "{device_battery_percentage}% 󰂯",
-        "format-alt": "{device_alias} 󰂯",
-        "tooltip-format": "{controller_alias}\t{controller_address}\n\n{num_connections} connected",
-        "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{num_connections} connected\n\n{device_enumerate}",
-        "tooltip-format-enumerate-connected": "{device_alias}\n{device_address}",
-        "tooltip-format-enumerate-connected-battery": "{device_alias}\n{device_address}\n{device_battery_percentage}%",
-        "on-click-right": "blueman-manager"
-    }, 
-    "battery": {
-        "format": "{capacity}% {icon}",
-        "format-icons": ["", "", "", "", ""]
-    },
-    "clock": {
-        "format-alt": "{:%a, %d. %b  %H:%M}"
-    },
-    "tray": {
-        "icon-size": 18,
-        "spacing": 10
-    },
-    "backlight/slider": {
-        "min": 20,
-        "max": 100,
-        "orientation": "horizontal"
-    },
-    "wireplumber": {
-        "format": "{volume}%",
-        "format-muted": "Mute",
-        "on-click": "wpctl set-mute @DEFAULT_SINK@ toggle",
-        "format-icons": ["", "", ""]
-    },
-    "user": {
-        "format": "{user}",
-        "interval": 60,
-        "on-click": "syspower",
-        "icon": true
-    },
-    "custom/syspower": {
-        "format": "Power",
-        "on-click": "syspower"
     }
-}]
+
+]
