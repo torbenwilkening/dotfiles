@@ -1,7 +1,11 @@
-
 background-color=#282a36
 text-color=#F8F8F2
 border-color=#282a36
+
+border-size=1
+border-radius=4
+
+font=Hack 10
 
 [urgency=low]
 border-color=#50FA7B
