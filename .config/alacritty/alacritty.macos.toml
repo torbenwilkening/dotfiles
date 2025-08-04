@@ -1,6 +1,6 @@
 [window]
 decorations = "transparent"
-# opacity = 0.90
+opacity = 0.95
 title = "Its me your Terminal"
 option_as_alt = "Both"
 
@@ -19,8 +19,9 @@ style = "Bold"
 family = "Hack Nerd Font"
 style = "Italic"
 
-[colors]
-primary.background = "#1e1e2e"
+[colors.primary]
+background = "#282a36"
+foreground = "#f8f8f2"
 
 [keyboard]
 # finally this is the fix for macos
