@@ -4,7 +4,6 @@ export ZSH="$HOME/.oh-my-zsh"
 # export ZSH=$HOME/.nix-profile/share/oh-my-zsh
 
 # great stuff: macovsky muse sonicradish arrow
-# ZSH_THEME="sonicradish"
 ZSH_THEME="dracula"
 
 plugins=(
@@ -24,7 +23,12 @@ alias ll="eza --icons -l"
 alias la="eza --icons -la"
 
 # with darwin
-#update="/run/current-system/sw/bin/darwin-rebuild switch"
+if [ "$(uname)" = "Darwin" ]; then
+    alias nix-update="/run/current-system/sw/bin/darwin-rebuild switch"
+fi
 
 # asdf setup
-#export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+if command -v asdf >/dev/null 2>&1; then
+    export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+fi
+
