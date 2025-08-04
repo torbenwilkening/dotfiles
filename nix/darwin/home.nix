@@ -29,30 +29,27 @@
     # ui applications
     # emacs # @todo emacs plus from homebrew for now, it seems bugged with yabai
     alacritty
-    nerd-fonts.hack
+    aerospace
 
-    # default language tools
-    nodejs_22
-    yarn
-    eslint
-    nodePackages.vue-language-server
-    # nodePackages.vls
-    nodePackages.typescript-language-server
-    python312
-    python312Packages.requests
-    python312Packages.python-lsp-server
-    go
-    gopls
-    rustup
+    # fonts and themes
+    nerd-fonts.hack
+    nerd-fonts.ubuntu
+
+    # work
+    asdf-vm
+    docker-compose
+    colima
+    docker
+    redis
+    mysql80
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
-  home.file = {
-    ".emacs".source = "${dotfiles}/.emacs";
-    ".zshrc".source = "${dotfiles}/.zshrc";
-    ".alacritty.toml".source = "${dotfiles}/.alacritty.toml";
-  };
+  # home.file = {
+  #   ".emacs".source = "${dotfiles}/.emacs";
+  #   ".zshrc".source = "${dotfiles}/.zshrc";
+  # };
 
   home.sessionVariables = {
     EDITOR = "emacs";
