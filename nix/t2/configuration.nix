@@ -50,10 +50,19 @@
   # Enable CUPS to print documents.
   # services.printing.enable = true;
 
+# rtkit (optional, recommended) allows Pipewire to use the realtime scheduler for increased performance.
+  security.rtkit.enable = true;
+  
   # Enable sound.
   services.pipewire = {
     enable = true;
     pulse.enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+  };
+
+  hardware.bluetooth = {
+    enable = true;
   };
 
   programs.nh = {
@@ -75,7 +84,7 @@
         command = "Hyperland";
       };
       background = {
-        path = "/etc/background.png"; # make sure it exists
+        path = "/etc/background.jpg"; # make sure it exists
         fit = "Fill";
       };
       widget.clock = {
@@ -142,11 +151,14 @@
     # default gui tools
     alacritty
     firefox-devedition
+    brave
     nautilus
     nwg-look
     dracula-theme
     bibata-cursors
     papirus-icon-theme
+    pavucontrol
+    blueberry
     
     # hyprland tools
     waybar # @todo theme
@@ -161,7 +173,6 @@
     hyprlock # lockscreen
     wleave # logout menu
     udiskie # auto mount
-    
   ];
   
   programs.hyprland = {
@@ -180,19 +191,6 @@
     shellAliases = {
       nix-update = "nixos-rebuild switch --flake /etc/nixos --sudo";
     }; 
-  };
-
-  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
-    "steam"
-    "steam-original"
-    "steam-unwrapped"
-    "steam-run"
-  ];
-  programs.steam = {
-    enable = true;
-    remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
-    dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
-    localNetworkGameTransfers.openFirewall = true; # Open ports in the firewall for Steam Local Network Game Transfers
   };
 
   
