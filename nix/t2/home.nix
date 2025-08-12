@@ -20,6 +20,33 @@
     };    
   };
 
+  # some webapps
+  xdg.desktopEntries.youtube = {
+    name = "YouTube";
+    exec = "brave --app=https://youtube.com";
+    icon = "youtube";
+  };
+  xdg.desktopEntries.gmail = {
+    name = "Google Mail";
+    exec = "brave --app=https://mail.google.com";
+    icon = "gmail";
+  };
+  xdg.desktopEntries.spotify = {
+    name = "Spotify";
+    exec = "brave --app=https://open.spotify.com/";
+    icon = "spotify";
+  };
+  xdg.desktopEntries.whatsapp = {
+    name = "WhatsApp";
+    exec = "brave --app=https://web.whatsapp.com/";
+    icon = "whatsapp";
+  };
+  xdg.desktopEntries.github = {
+    name = "GitHub";
+    exec = "brave --app=https://github.com/torbenwilkening";
+    icon = "github";
+  };
+  
   # This value determines the home Manager release that your
   # configuration is compatible with. This helps avoid breakage
   # when a new home Manager release introduces backwards
