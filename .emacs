@@ -100,6 +100,7 @@
 ;; direnv
 (straight-use-package 'direnv)
 (require 'direnv)
+(direnv-mode)
 
 ;;;;;;;;;;;;;
 ;; theming ;;
@@ -491,7 +492,6 @@
 ;; flycheck
 (straight-use-package 'flycheck)
 (global-flycheck-mode)
-;;(flymake-mode -1)
 
 ;; yasnippet
 (straight-use-package 'yasnippet)
@@ -563,9 +563,8 @@
 
 (require 'tree-sitter)
 (require 'tree-sitter-langs)
-(global-tree-sitter-mode)
 (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
-
+;;(global-tree-sitter-mode) ;; i'm not ready yet
 
 ;; yaml
 (straight-use-package 'yaml-mode) ; yaml-language-server
@@ -590,7 +589,7 @@
 
 ;; nix
 (straight-use-package 'nix-mode)
-(add-hook 'nix-mode #'eglot-ensure)
+(add-hook 'nix-mode-hook #'eglot-ensure)
 (add-to-list 'eglot-server-programs '(nix-mode . ("nil")))
 (add-to-list 'auto-mode-alist '("\\.nix\\'" . nix-mode))
 
@@ -692,17 +691,63 @@
 ;; for vetur
 ;;npm install vls -g
 
-;; vue2 with vetur
+;; vue2 with vetur (vetur still works better for vue2)
 (define-derived-mode vetur-vue-mode web-mode "Vue2"
   "A major mode derived from vue-mode with vetur language server")
 (add-hook 'vetur-vue-mode-hook #'eglot-ensure)
 (add-hook 'vetur-vue-mode-hook 'web-modes-indent-hook)
-;; vetur still works better for vue2
 (add-to-list 'eglot-server-programs '(vetur-vue-mode "vls" "--stdio"))
-;; or try volar
-;; for volar: (add-to-list 'eglot-server-programs '(vetur-vue-mode "vue-language-server" "--stdio"))
 
-(add-to-list 'auto-mode-alist '("\\.vue\\'" . vetur-vue-mode))
+
+(define-derived-mode vue3-mode web-mode "Vue3"
+  "A major mode derived from vue-mode with volar language server")
+(add-hook 'vue3-mode-hook #'eglot-ensure)
+(add-hook 'vue3-mode-hook 'web-modes-indent-hook)
+(defun vue-eglot-init-options ()
+  "Set SDK path and default options."
+  (let ((tsdk-path (expand-file-name
+                    "lib/node_modules/typescript/lib/"
+                    (shell-command-to-string "nix-store --query -q `which tsc` | xargs")
+                    )))
+    ;;"/nix/store/8y2ckpw2l0arpw5hwkl5bc4mf4abgf12-typescript-5.8.3/lib/node_modules/typescript/lib/"
+    `(:typescript (:tsdk "/nix/store/8y2ckpw2l0arpw5hwkl5bc4mf4abgf12-typescript-5.8.3/lib/node_modules/typescript/lib/" ;,tsdk-path
+                         :vue (:hybridMode :json-false)
+                         :languageFeatures (:completion
+                                            (:defaultTagNameCase "both"
+                                                                 :defaultAttrNameCase "kebabCase"
+                                                                 :getDocumentNameCasesRequest nil
+                                                                 :getDocumentSelectionRequest nil)
+                                            :diagnostics
+                                            (:getDocumentVersionRequest nil))
+                         :documentFeatures (:documentFormatting
+                                            (:defaultPrintWidth 100
+                                                                :getDocumentPrintWidthRequest nil)
+                                            :documentSymbol t
+                                            :documentColor t)))))
+(put 'vue3-mode 'eglot-language-id "vue")
+(add-to-list 'eglot-server-programs ;; nix-env -iA nixpkgs.nodePackages.volar
+             `(vue3-mode . ("vue-language-server" "--stdio" :initializationOptions ,(vue-eglot-init-options))))
+
+;;cd ~/.emacs.d
+;;git clone https://github.com/8uff3r/vue-ts-mode.git
+(setq treesit-language-source-alist
+      '((vue "https://github.com/ikatyang/tree-sitter-vue")
+        (css "https://github.com/tree-sitter/tree-sitter-css")
+        (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+        (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")))
+;; do this once... @todo check if it ran already
+;;(mapc #'treesit-install-language-grammar '(vue css typescript tsx)) ;; or install manually for each language
+
+(add-to-list 'load-path (concat user-emacs-directory "vue-ts-mode"))
+(require 'vue-ts-mode)
+(put 'vue-ts-mode 'eglot-language-id "vue")
+(add-to-list 'eglot-server-programs '(vue-ts-mode "vue-language-server" "--stdio" :initializationOptions '(:vue (:hybridMode :json-false))))
+(setq eglot-connect-timeout 120)
+
+
+;; pick your poison here: vue-ts-mode for tree sitter or broken volar with vue3-mode
+(add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-ts-mode))
+
 
 
 ;; scala
