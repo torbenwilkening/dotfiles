@@ -32,3 +32,13 @@ if command -v asdf >/dev/null 2>&1; then
     export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
 fi
 
+# direnv setup
+if command -v direnv >/dev/null 2>&1; then
+    eval "$(direnv hook zsh)"    
+fi
+
+# yarn global packages setup
+if command -v yarn >/dev/null 2>&1; then
+    export PATH="$HOME/.yarn/bin:$PATH"
+fi
+
