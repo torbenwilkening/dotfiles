@@ -1,15 +1,15 @@
 
 #!/bin/sh
 
-git pull
+# git pull
 
-ln -sf $(pwd)/.config/aerospace /home/$(whoami)/.config/aerospace
-ln -sf $(pwd)/.config/alacritty /home/$(whoami)/.config/alacritty
-ln -sf $(pwd)/.config/anyrun /home/$(whoami)/.config/anyrun
-ln -sf $(pwd)/.config/hypr /home/$(whoami)/.config/hypr
-ln -sf $(pwd)/.config/mako /home/$(whoami)/.config/mako
-ln -sf $(pwd)/.config/waybar /home/$(whoami)/.config/waybar
-
+#cp -R $(pwd)/.config/aerospace /home/$(whoami)/.config
+#cp -R $(pwd)/.config/alacritty /home/$(whoami)/.config
+#cp -R $(pwd)/.config/anyrun /home/$(whoami)/.config
+#cp -R $(pwd)/.config/hypr /home/$(whoami)/.config
+#cp -R $(pwd)/.config/mako /home/$(whoami)/.config
+#cp -R $(pwd)/.config/waybar /home/$(whoami)/.config
+cp -r /etc/dotfiles/.config/* /home/$(whoami)/.config/
 
 
 

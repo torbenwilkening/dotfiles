@@ -4,7 +4,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # export ZSH=$HOME/.nix-profile/share/oh-my-zsh
 
 # great stuff: macovsky muse sonicradish arrow
-ZSH_THEME="dracula"
+ZSH_THEME="muse"
 
 plugins=(
     docker
