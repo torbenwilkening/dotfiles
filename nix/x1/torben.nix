@@ -49,8 +49,8 @@
     gtk3 = {
       extraConfig.gtk-application-prefer-dark-theme = true;
     };    
-  };
-
+  };  
+  
   # some webapps
   xdg.desktopEntries.youtube = {
     name = "YouTube";

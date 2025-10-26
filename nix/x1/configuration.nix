@@ -7,7 +7,7 @@
 {
   imports =
     [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
+      /etc/nixos/hardware-configuration.nix
     ];
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -162,7 +162,8 @@
     libnotify
     networkmanagerapplet # network ui
     hyprpolkitagent # permissions
-    anyrun # launcher
+    # anyrun # launcher
+    walker # launcher
     hypridle # idle
     hyprlock # lockscreen
     wleave # logout menu
