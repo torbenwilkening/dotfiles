@@ -1,35 +1,9 @@
+
 { config, pkgs, dotfiles, ... }:
 
 {
-  home.username = "torben";
-  home.homeDirectory = "/home/torben";
-
-  # Packages that should be installed to the user profile.
-  home.packages = with pkgs; [
-    # things with ui
-    emacs
-    nerd-fonts.hack
-    nerd-fonts.ubuntu
-    firefox-wayland
-
-    nil # nix lsp
-
-    # nodejs global things and lsp
-    nodejs_22
-    yarn
-    pnpm
-    eslint
-    vue-language-server
-    typescript
-    typescript-language-server
-  ];
-
-  # basic configuration of git, please change to your own
-  programs.git = {
-    enable = true;
-    userName = "torbenwilkening";
-    userEmail = "no-reply@github.com";
-  };
+  home.username = "henrik";
+  home.homeDirectory = "/home/henrik";
 
   programs.alacritty = {
     enable = true;
@@ -54,11 +28,38 @@
     };
   };
 
-  home.file = {
-
-    ".emacs".source = "${dotfiles}/.emacs";
-
+  gtk = {
+    enable = true;
+    theme = {
+      name = "Dracula";
+      package = pkgs.dracula-theme;
+    };
+    iconTheme = {
+      name = "Papirus";
+      package = pkgs.papirus-icon-theme;
+    };
+    gtk3 = {
+      extraConfig.gtk-application-prefer-dark-theme = true;
+    };    
   };
+
+  # some webapps
+  xdg.desktopEntries.youtube = {
+    name = "YouTube";
+    exec = "brave --app=https://youtube.com";
+    icon = "youtube";
+  };
+  xdg.desktopEntries.netflix = {
+    name = "Netflix";
+    exec = "brave --app=https://netflix.com";
+    icon = "netflix";
+  };
+  xdg.desktopEntries.spotify = {
+    name = "Spotify";
+    exec = "brave --app=https://open.spotify.com/";
+    icon = "spotify";
+  };
+
   # This value determines the home Manager release that your
   # configuration is compatible with. This helps avoid breakage
   # when a new home Manager release introduces backwards

@@ -25,7 +25,8 @@
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
-              home-manager.users.torben = ./home.nix;
+              home-manager.users.torben = ./torben.nix;
+              home-manager.users.henrik = ./henrik.nix;
 
               # Optionally, use home-manager.extraSpecialArgs to pass
               # arguments to home.nix

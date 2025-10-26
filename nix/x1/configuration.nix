@@ -52,12 +52,20 @@
   # Enable CUPS to print documents.
   # services.printing.enable = true;
 
+
+  # rtkit (optional, recommended) allows Pipewire to use the realtime scheduler for increased performance.
+  security.rtkit.enable = true;
+
   # Enable sound.
-  # hardware.pulseaudio.enable = true;
-  # OR
   services.pipewire = {
     enable = true;
     pulse.enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+  };
+  
+  hardware.bluetooth = {
+    enable = true;
   };
 
   # Enable touchpad support (enabled default in most desktopManager).
@@ -74,12 +82,17 @@
   };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.torben = {
-    isNormalUser = true;
-    shell = pkgs.zsh;
-    extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
-    # packages managed by home manager
-    # packages = with pkgs; [ ];
+  users.users = {
+    torben = {
+      isNormalUser = true;
+      shell = pkgs.zsh;
+      extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
+    };
+    henrik = {
+      isNormalUser = true;
+      shell = pkgs.zsh;
+      extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
+    };
   };
 
   programs.zsh = {
@@ -91,43 +104,36 @@
     shellAliases = {
       ll = "eza --icons -l";
       la = "eza --icons -la";
-      update = "nixos-rebuild switch --use-remote-sudo";
-    };
-    
-    ohMyZsh = {
-      enable = true;
-      plugins = [
-        "docker"
-        "git"
-        "kubectl"
-        "node"
-        "python"
-        "rust"
-        "sudo"
-      ];
-      theme = "muse"; # "muse macovsky arrow" are great
+      # update = "nixos-rebuild switch --use-remote-sudo";
+      nix-update = "nixos-rebuild switch --flake /etc/dotfiles/nix/x1 --use-remote-sudo";
     };
   };
 
-
-  programs.hyprland = {
-    enable = true;
-    xwayland.enable = true;
-  };
-
+  fonts.packages = with pkgs; [
+    nerd-fonts.hack
+    nerd-fonts.ubuntu
+    nerd-fonts.fira-code
+    nerd-fonts.roboto-mono
+    nerd-fonts.jetbrains-mono
+  ];
+  
   environment.systemPackages = with pkgs; [
-    # utils
-    wget
-    jq
-    ripgrep
-    eza
-    dnsutils
-    htop
+
+    # default tools
+    emacs
+    nil
     git
+    wget
+    curl
+    ripgrep
+    jq
+    eza
+    htop
+    dnsutils
     gnupg
     unzip
+    fzf
     ffmpeg
-    socat # mpvpaper dependency
     
     # compiling
     cmake
@@ -135,23 +141,46 @@
     gnumake
     libtool
 
-    # gui
-    walker # application runner
-    waybar # top and bottom bar
-    waypaper # wallpaper frontend
+
+    # default gui tools
+    alacritty
+    firefox
+    brave
+    nautilus
+    nwg-look
+    dracula-theme
+    bibata-cursors
+    papirus-icon-theme
+    pavucontrol
+    blueberry
+    
+    # hyprland tools
+    waybar # @todo theme
+    waypaper
+    hyprpaper
+    mako # notifications
+    libnotify
+    networkmanagerapplet # network ui
+    hyprpolkitagent # permissions
+    anyrun # launcher
+    hypridle # idle
+    hyprlock # lockscreen
+    wleave # logout menu
+    udiskie # auto mount
     swww # wallpaper backend for images
-    # mpvpaper # wallpaper backend for videos
     nautilus # gtk file manager
     networkmanagerapplet # gtk network manager frontend
     hyprpolkitagent # for permissions
-    nwg-look # for gtk theming
-    
-    # plugins
-    # hyprlandPlugins.hyprfocus # for borderless, currently broken
-    
+    nwg-look # for gtk theming    
     
   ];
 
+  programs.hyprland = {
+    enable = true;
+    xwayland.enable = true;
+  };
+
+  programs.dconf.enable = true;
 
   # hints electron apps to use wayland
   environment.sessionVariables.NIXOS_OZONE_WL = "1"; 
