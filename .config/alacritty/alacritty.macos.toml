@@ -2,8 +2,8 @@
 decorations = "transparent"
 opacity = 0.95
 title = "Its me your Terminal"
+dynamic_title = true
 option_as_alt = "Both"
-
 padding.x = 12
 padding.y = 30
 
@@ -19,6 +19,9 @@ style = "Bold"
 family = "Hack Nerd Font"
 style = "Italic"
 
+[font]
+size = 13
+
 [colors.primary]
 background = "#282a36"
 foreground = "#f8f8f2"
@@ -33,3 +36,6 @@ bindings = [
   { key = "n", mods = "Alt", chars =  "~" },
   { key = "l", mods = "Alt", chars =  "@" },
 ]
+
+[selection]
+save_to_clipboard = true

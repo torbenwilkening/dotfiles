@@ -79,6 +79,7 @@
 (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize))
 (exec-path-from-shell-copy-env "PATH")
+(exec-path-from-shell-copy-env "NIX_PATH")
 
 ;; setup world clocks
 (setq world-clock-list
@@ -219,26 +220,6 @@
        )))
 ;; (alert "this is an alert")
 
-;; chatgpt
-;; (require 'auth-source)
-;; (use-package shell-maker
-;;   :straight (:host github :repo "xenodium/chatgpt-shell" :files ("shell-maker.el")))
-
-;; (use-package chatgpt-shell
-;;   :requires shell-maker
-;;   :straight (:host github :repo "xenodium/chatgpt-shell" :files ("chatgpt-shell.el")))
-
-;; $ cat ~/.authinfo
-;; machine api.openai.com password <APIKEY>
-;; (setq chatgpt-shell-openai-key
-;;       (auth-source-pick-first-password :host "api.openai.com"))
-
-
-;; if you are using the "pass" password manager
-;;(setq chatgpt-shell-openai-key
-;;      (lambda ()
-;;        ;; (auth-source-pass-get 'secret "openai-key") ; alternative using pass support in auth-sources
-;;        ;; (nth 0 (process-lines "pass" "show" "openai-key"))))
 
 ;; some functions
 
@@ -529,6 +510,10 @@
 (global-set-key (kbd "M-f") 'project-find-file)
 (global-set-key (kbd "M-s") 'project-switch-project)
 
+(use-package project
+ :init
+ (setq project-vc-extra-root-markers '(".envrc")))
+
 
 (straight-use-package 'eglot)
 (require 'eglot)
@@ -565,6 +550,27 @@
 (require 'tree-sitter-langs)
 (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
 ;;(global-tree-sitter-mode) ;; i'm not ready yet
+
+(setq treesit-language-source-alist
+   '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+     (cmake "https://github.com/uyha/tree-sitter-cmake")
+     (css "https://github.com/tree-sitter/tree-sitter-css")
+     (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+     (go "https://github.com/tree-sitter/tree-sitter-go")
+     (html "https://github.com/tree-sitter/tree-sitter-html")
+     (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+     (json "https://github.com/tree-sitter/tree-sitter-json")
+     (make "https://github.com/alemuller/tree-sitter-make")
+     (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+     (python "https://github.com/tree-sitter/tree-sitter-python")
+     (toml "https://github.com/tree-sitter/tree-sitter-toml")
+     (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+     (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+     (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+
+;; clone all
+;; (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))
+
 
 ;; yaml
 (straight-use-package 'yaml-mode) ; yaml-language-server
@@ -612,11 +618,6 @@
 (straight-use-package 'alchemist)
 (add-to-list 'auto-mode-alist '("\\.ex\\'" . elixir-mode))
 
-;; python
-(straight-use-package 'python-mode)
-(add-hook 'python-mode-hook #'eglot-ensure) ;pip install python-language-server
-(add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
-
 ;; markdown
 (straight-use-package 'markdown-mode) ; brew install marksman
 (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman")))
@@ -647,16 +648,19 @@
 
 ;; typescript / javascript
 (straight-use-package 'typescript-mode)
-(add-hook 'typescript-mode-hook 'js-modes-indent-hook)
-(add-hook 'typescript-mode-hook #'eglot-ensure)
-(add-hook 'typescript-mode-hook 'flycheck-mode)
-(add-to-list 'eglot-server-programs '(typescript-mode . ("typescript-language-server" "--stdio")))
-(straight-use-package 'prettier-js)
-(add-to-list 'auto-mode-alist '("\\.js\\'" . typescript-mode))
-(add-to-list 'auto-mode-alist '("\\.mjs\\'" . typescript-mode))
-(add-to-list 'auto-mode-alist '("\\.jsx\\'" . typescript-mode))
-(add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
-(add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
+;(straight-use-package 'prettier-js)
+(add-to-list 'auto-mode-alist '("\\.js\\'" . typescript-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.mjs\\'" . typescript-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.jsx\\'" . tsx-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
+
+(add-hook 'typescript-ts-mode-hook 'flycheck-mode)
+(add-hook 'typescript-ts-mode-hook 'js-modes-indent-hook)
+(add-hook 'typescript-ts-mode-hook #'eglot-ensure)
+(add-hook 'tsx-ts-mode-hook 'flycheck-mode)
+(add-hook 'tsx-ts-mode-hook 'js-modes-indent-hook)
+(add-hook 'tsx-ts-mode-hook #'eglot-ensure)
 
 
 ;; hooks for web-mode / css-mode / js-mode indent
@@ -681,73 +685,11 @@
   (setq web-mode-code-indent-offset 2))
 (add-hook 'web-mode-hook  'web-modes-indent-hook)
 
-;;;;;;;;;;;;
-;; vue.js ;;
-;;;;;;;;;;;;
 
-;;npm install -g typescript-language-server
-;; for volar
-;;npm install -g @vue/language-server
-;; for vetur
-;;npm install vls -g
-
-;; vue2 with vetur (vetur still works better for vue2)
-(define-derived-mode vetur-vue-mode web-mode "Vue2"
-  "A major mode derived from vue-mode with vetur language server")
-(add-hook 'vetur-vue-mode-hook #'eglot-ensure)
-(add-hook 'vetur-vue-mode-hook 'web-modes-indent-hook)
-(add-to-list 'eglot-server-programs '(vetur-vue-mode "vls" "--stdio"))
-
-
-(define-derived-mode vue3-mode web-mode "Vue3"
-  "A major mode derived from vue-mode with volar language server")
-(add-hook 'vue3-mode-hook #'eglot-ensure)
-(add-hook 'vue3-mode-hook 'web-modes-indent-hook)
-(defun vue-eglot-init-options ()
-  "Set SDK path and default options."
-  (let ((tsdk-path (expand-file-name
-                    "lib/node_modules/typescript/lib/"
-                    (shell-command-to-string "nix-store --query -q `which tsc` | xargs")
-                    )))
-    ;;"/nix/store/8y2ckpw2l0arpw5hwkl5bc4mf4abgf12-typescript-5.8.3/lib/node_modules/typescript/lib/"
-    `(:typescript (:tsdk "/nix/store/8y2ckpw2l0arpw5hwkl5bc4mf4abgf12-typescript-5.8.3/lib/node_modules/typescript/lib/" ;,tsdk-path
-                         :vue (:hybridMode :json-false)
-                         :languageFeatures (:completion
-                                            (:defaultTagNameCase "both"
-                                                                 :defaultAttrNameCase "kebabCase"
-                                                                 :getDocumentNameCasesRequest nil
-                                                                 :getDocumentSelectionRequest nil)
-                                            :diagnostics
-                                            (:getDocumentVersionRequest nil))
-                         :documentFeatures (:documentFormatting
-                                            (:defaultPrintWidth 100
-                                                                :getDocumentPrintWidthRequest nil)
-                                            :documentSymbol t
-                                            :documentColor t)))))
-(put 'vue3-mode 'eglot-language-id "vue")
-(add-to-list 'eglot-server-programs ;; nix-env -iA nixpkgs.nodePackages.volar
-             `(vue3-mode . ("vue-language-server" "--stdio" :initializationOptions ,(vue-eglot-init-options))))
-
-;;cd ~/.emacs.d
-;;git clone https://github.com/8uff3r/vue-ts-mode.git
-(setq treesit-language-source-alist
-      '((vue "https://github.com/ikatyang/tree-sitter-vue")
-        (css "https://github.com/tree-sitter/tree-sitter-css")
-        (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
-        (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")))
-;; do this once... @todo check if it ran already
-;;(mapc #'treesit-install-language-grammar '(vue css typescript tsx)) ;; or install manually for each language
-
-(add-to-list 'load-path (concat user-emacs-directory "vue-ts-mode"))
-(require 'vue-ts-mode)
-(put 'vue-ts-mode 'eglot-language-id "vue")
-(add-to-list 'eglot-server-programs '(vue-ts-mode "vue-language-server" "--stdio" :initializationOptions '(:vue (:hybridMode :json-false))))
-(setq eglot-connect-timeout 120)
-
-
-;; pick your poison here: vue-ts-mode for tree sitter or broken volar with vue3-mode
-(add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-ts-mode))
-
+;; python
+(straight-use-package 'python-mode)
+(add-hook 'python-ts-mode-hook #'eglot-ensure)
+(add-to-list 'auto-mode-alist '("\\.py\\'" . python-ts-mode))
 
 
 ;; scala
@@ -782,6 +724,38 @@
 ;;  -o /usr/local/bin/metals-emacs -f
 
 
+;; https://github.com/joaotavora/rassumfrassum with eglot
+(with-eval-after-load 'eglot
+  (add-to-list
+   'eglot-server-programs
+   '((tsx-ts-mode typescript-ts-mode)
+     . ("rass"
+        "--"
+        "typescript-language-server" "--stdio"
+        "--"
+        "vscode-eslint-language-server" "--stdio"
+        "--"
+        "tailwindcss-language-server" "--stdio")))
+
+  (add-to-list 'eglot-server-programs
+               '(python-mode . ("rass" "--" "ty" "server" "--"
+                                "ruff" "server")))
+
+  )
+
+
+;;;;;;;;;;;;;;;;;;;
+;; treesitter    ;;
+;;;;;;;;;;;;;;;;;;;
+
+;; (setq major-mode-remap-alist
+;;  '((yaml-mode . yaml-ts-mode)
+;;    (bash-mode . bash-ts-mode)
+;;    (js2-mode . js-ts-mode)
+;;    (typescript-mode . typescript-ts-mode)
+;;    (json-mode . json-ts-mode)
+;;    (css-mode . css-ts-mode)
+;;    (python-mode . python-ts-mode)))
 
 
 
