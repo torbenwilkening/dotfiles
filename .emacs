@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -42,10 +43,26 @@
     (hide-mode-line-mode)))
 
 
+
+
 ;;;;;;;;;;;;;
 ;; general ;;
 ;;;;;;;;;;;;;
+;; (menu-bar-mode -1)
+;; (tool-bar-mode -1)
+;; (scroll-bar-mode -1)
 
+(modify-all-frames-parameters
+ '((menu-bar-lines . 0)
+   (tool-bar-lines . 0)
+   (vertical-scroll-bars . nil)))
+
+
+;; (if (display-graphic-p)
+;;     (progn
+;;       (menu-bar-mode -1)
+;;       (tool-bar-mode -1)
+;;       (scroll-bar-mode -1)))
 
 ;; default window size
 ;;(when window-system
@@ -106,12 +123,6 @@
 ;;;;;;;;;;;;;
 ;; theming ;;
 ;;;;;;;;;;;;;
-
-(if (display-graphic-p)
-    (progn
-      (menu-bar-mode -1)
-      (tool-bar-mode -1)
-      (scroll-bar-mode -1)))
 (display-battery-mode 1)
 (add-to-list 'default-frame-alist '(ns-appearance . dark))
 (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
@@ -144,7 +155,10 @@
 ;;(load-theme 'doom-molokai t)
 ;;(load-theme 'catppuccin t)
 ;;(load-theme 'dracula t)
-(load-theme 'doom-dracula t)
+;;(load-theme 'doom-dracula t)
+
+(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+(load-theme 'noctalia t)
 
 (straight-use-package 'nyan-mode)
 (nyan-mode 1)
@@ -546,9 +560,9 @@
 (straight-use-package 'tree-sitter)
 (straight-use-package 'tree-sitter-langs)
 
-(require 'tree-sitter)
-(require 'tree-sitter-langs)
-(add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+;; (require 'tree-sitter)
+;; (require 'tree-sitter-langs)
+;; (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
 ;;(global-tree-sitter-mode) ;; i'm not ready yet
 
 (setq treesit-language-source-alist
@@ -839,3 +853,21 @@
 ;;(global-set-key (kbd "<f1> v") 'counsel-describe-variable)
 ;;(global-set-key (kbd "<f1> o") 'counsel-describe-symbol)
 ;;(global-set-key (kbd "<f1> l") 'counsel-find-library)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("1e64be1ce8ac3b11fe175699dafd317330c3176e9fc6f3122d542ef1ce000ea6"
+     "91c5f183358ae3a2f0daa7b022c5ebf6a8dcc78ffbb42d0572e78b0acd23e3b3"
+     "ab280e79ea968cee506e265bb4c08856ea33d594309bf1d65f0f508a7e3c1b9d"
+     "228629959edeb7f30821a07140369ebe20122598e8f48daf2fbeed750b929b1a"
+     "92246a9673a1cce5998ac614cb5bfc63044843b7e1dfb5924dfca2f90a946e15"
+     default)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
