@@ -747,8 +747,8 @@
         "--"
         "typescript-language-server" "--stdio"
         "--"
-        "vscode-eslint-language-server" "--stdio"
-        "--"
+        ;; "vscode-eslint-language-server" "--stdio"
+        ;; "--"
         "tailwindcss-language-server" "--stdio")))
 
   (add-to-list 'eglot-server-programs
