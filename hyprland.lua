@@ -21,21 +21,20 @@ hl.monitor({
     output   = "eDP-1",
     mode     = "preferred",
     position = "3440x0",
-    scale    = "1",
+    scale    = "2",
 })
 hl.monitor({
     output   = "DP-3",
     mode     = "preferred",
     position = "0x0",
-    scale    = "1.5",
+    scale    = "1",
 })
 -- Single Monitor Setup
-hl.monitor({
-    output   = "eDP-1",
-    mode     = "preferred",
-    position = "0x0",
-    scale    = "2",
-})
+-- hl.monitor({
+--     output   = "eDP-1",
+--     mode     = "preferred",
+--     scale    = "2",
+-- })
 
 ---------------------
 ---- MY PROGRAMS ----
@@ -177,11 +176,11 @@ hl.config({
 })
 
 -- See https://wiki.hypr.land/Configuring/Layouts/Master-Layout/ for more
-hl.config({
-    master = {
-        new_status = "master",
-    },
-})
+-- hl.config({
+--     master = {
+--         new_status = "master",
+--     },
+-- })
 
 -- See https://wiki.hypr.land/Configuring/Layouts/Scrolling-Layout/ for more
 hl.config({
@@ -190,6 +189,25 @@ hl.config({
     },
 })
 
+
+hl.config({
+  general = {
+    layout   = "master",
+    gaps_in  = 5,
+    gaps_out = 10,
+  },
+  master = {
+    orientation = "center",
+    slave_count_for_center_master = 2,
+    mfact = 0.5,
+  },
+  misc = {
+    vrr = 1,  -- Adaptive Sync: 0 = aus, 1 = an, 2 = nur Vollbild
+  },
+  xwayland = {
+    force_zero_scaling = true,
+  },
+})
 ----------------
 ----  MISC  ----
 ----------------
